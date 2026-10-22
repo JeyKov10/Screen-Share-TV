@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -18,8 +19,12 @@ namespace LGCastPC
     {
         private ClientWebSocket? _webSocket;
         private CancellationTokenSource? _cts;
+        private UdpClient? _rtpVideoClient;
+        private UdpClient? _rtpAudioClient;
+        private CancellationTokenSource? _rtpCts;
         private int _nextRequestId = 0;
         private string _estadoConexion = "UNCONNECTED";
+        private string _tvIpAddress = "";
         private int _videoUdpPort = 0;
         private int _audioUdpPort = 0;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _respuestasPendientes = new();
@@ -316,19 +321,46 @@ namespace LGCastPC
                     AgregarLog("[SUBSCRIBE EXITOSO] TV confirmó suscripción (subscribed: true).");
                 }
 
-                // Procesamiento reactivo de comandos enviados por la TV (LGCastCommand / handleCommand)
+                // Procesamiento reactivo de comandos y capacidades enviadas por la TV
                 if (root.TryGetProperty("payload", out var payload))
                 {
-                    if (payload.TryGetProperty("videoUdpPort", out var vPortElem) && vPortElem.TryGetInt32(out int vPort))
+                    if (payload.TryGetProperty("ipAddress", out var ipElem))
                     {
-                        _videoUdpPort = vPort;
-                        AgregarLog($"[TV CAPABILITY] videoUdpPort registrado: {_videoUdpPort}");
+                        _tvIpAddress = ipElem.GetString() ?? "";
+                        AgregarLog($"[TV CAPABILITY] IP: {_tvIpAddress}");
                     }
 
-                    if (payload.TryGetProperty("audioUdpPort", out var aPortElem) && aPortElem.TryGetInt32(out int aPort))
+                    if (payload.TryGetProperty("mirroring", out var mirroringElem))
                     {
-                        _audioUdpPort = aPort;
-                        AgregarLog($"[TV CAPABILITY] audioUdpPort registrado: {_audioUdpPort}");
+                        if (mirroringElem.TryGetProperty("video", out var videoElem) &&
+                            videoElem.TryGetProperty("udpPort", out var vPortElem) &&
+                            vPortElem.TryGetInt32(out int vPort))
+                        {
+                            _videoUdpPort = vPort;
+                            AgregarLog($"[TV CAPABILITY] Video UDP Port: {_videoUdpPort}");
+                        }
+
+                        if (mirroringElem.TryGetProperty("audio", out var audioElem) &&
+                            audioElem.TryGetProperty("udpPort", out var aPortElem) &&
+                            aPortElem.TryGetInt32(out int aPort))
+                        {
+                            _audioUdpPort = aPort;
+                            AgregarLog($"[TV CAPABILITY] Audio UDP Port: {_audioUdpPort}");
+                        }
+                    }
+                    else
+                    {
+                        if (payload.TryGetProperty("videoUdpPort", out var vPortElem2) && vPortElem2.TryGetInt32(out int vPort2))
+                        {
+                            _videoUdpPort = vPort2;
+                            AgregarLog($"[TV CAPABILITY] Video UDP Port: {_videoUdpPort}");
+                        }
+
+                        if (payload.TryGetProperty("audioUdpPort", out var aPortElem2) && aPortElem2.TryGetInt32(out int aPort2))
+                        {
+                            _audioUdpPort = aPort2;
+                            AgregarLog($"[TV CAPABILITY] Audio UDP Port: {_audioUdpPort}");
+                        }
                     }
 
                     if (payload.TryGetProperty("cmd", out var cmdElem))
@@ -375,7 +407,7 @@ namespace LGCastPC
 
         /// <summary>
         /// Procesa el comando PLAY enviado por la TV a través de la suscripción getCommand (MirroringService.onReceivePlayCommand).
-        /// Intercepta el comando antes del inicio de la captura y transmisión de paquetes RTP.
+        /// Intercepta el comando e inicia el transporte de paquetes RTP de prueba hacia la TV.
         /// </summary>
         private void HandlePlayCommand(string json, JsonElement payload)
         {
@@ -396,6 +428,9 @@ namespace LGCastPC
             AgregarLog($"[VIDEO UDP PORT ACTUAL]: {(_videoUdpPort > 0 ? _videoUdpPort.ToString() : "No registrado")}");
             AgregarLog($"[AUDIO UDP PORT ACTUAL]: {(_audioUdpPort > 0 ? _audioUdpPort.ToString() : "No registrado")}");
             AgregarLog("==================================================\n");
+
+            // Iniciar la transmisión de paquetes RTP de prueba (UDP) hacia los puertos recibidos
+            _ = IniciarRtpTestAsync();
         }
 
         /// <summary>
@@ -1036,13 +1071,14 @@ namespace LGCastPC
 
         /// <summary>
         /// Transmite el comando PLAY (LGCastCommand.sendPlay REA) a ssap://com.webos.service.appcasting/sendCommand
-        /// inmediatamente después de SET_PARAMETER exitoso.
+        /// e inicia el transporte RTP mediante IniciarRtpTestAsync() tras la confirmación exitosa de la TV.
         /// </summary>
         private async Task EnviarPlayAsync(string clientKey)
         {
             if (_webSocket == null || _webSocket.State != WebSocketState.Open) return;
 
             int id = ObtenerSiguienteIdInt();
+            string idStr = id.ToString();
             string uri = "ssap://com.webos.service.appcasting/sendCommand";
 
             string jsonPlay = "{" +
@@ -1055,6 +1091,9 @@ namespace LGCastPC
                 "}" +
             "}";
 
+            var playTcs = new TaskCompletionSource<string>();
+            _respuestasPendientes[idStr] = playTcs;
+
             AgregarLog("\n[FLUJO APK] Transmitiendo PLAY (sendPlay REA):");
             AgregarLog($"JSON enviado: {jsonPlay}");
 
@@ -1062,6 +1101,16 @@ namespace LGCastPC
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(jsonPlay);
                 await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+
+                // Espera confirmación de PLAY de la TV (returnValue: true)
+                var playRes = await Task.WhenAny(playTcs.Task, Task.Delay(3000));
+                if (playRes == playTcs.Task)
+                {
+                    AgregarLog($"[FLUJO APK] Respuesta PLAY recibida de la TV: {playTcs.Task.Result}");
+                }
+
+                // Iniciar la transmisión de paquetes RTP de prueba inmediatamente tras PLAY exitoso
+                _ = IniciarRtpTestAsync();
             }
             catch (Exception ex)
             {
@@ -1359,6 +1408,143 @@ namespace LGCastPC
             }
 
             TxtLogs.ScrollToEnd();
+        }
+
+        /// <summary>
+        /// Inicia la apertura de sockets UDP y la transmisión continua de paquetes RTP de prueba
+        /// hacia los puertos videoUdpPort y audioUdpPort de la TV para validar el transporte UDP.
+        /// </summary>
+        private async Task IniciarRtpTestAsync()
+        {
+            string ipTarget = !string.IsNullOrEmpty(_tvIpAddress) ? _tvIpAddress : TxtIpTv.Text.Trim();
+
+            if (string.IsNullOrEmpty(ipTarget) || _videoUdpPort <= 0)
+            {
+                AgregarLog("⚠️ [RTP TEST] No hay IP o puerto UDP de vídeo válido registrado para iniciar el transporte RTP.");
+                return;
+            }
+
+            if (_rtpCts != null && !_rtpCts.IsCancellationRequested)
+            {
+                AgregarLog("ℹ️ [RTP TEST] El transporte UDP / RTP ya se encuentra activo.");
+                return;
+            }
+
+            uint ssrc = 1356955624; // SSRC exacto 0x50DC04A8 de RTPStreaming.open() REA
+            ushort videoSeq = 0;
+            ushort audioSeq = 0;
+            uint videoTs = 0;
+            uint audioTs = 0;
+
+            AgregarLog("\n=== INICIANDO TRANSPORTE UDP / RTP TEST (REA) ===");
+            AgregarLog($"[DESTINO IP]: {ipTarget}");
+            AgregarLog($"[PUERTO VIDEO UDP]: {_videoUdpPort}");
+            AgregarLog($"[PUERTO AUDIO UDP]: {(_audioUdpPort > 0 ? _audioUdpPort.ToString() : "N/A")}");
+            AgregarLog($"[SSRC]: {ssrc} (0x50DC04A8)");
+            AgregarLog($"[SEQUENCE INITIAL]: {videoSeq}");
+            AgregarLog($"[TIMESTAMP INITIAL]: {videoTs}");
+
+            try
+            {
+                _rtpVideoClient?.Close();
+                _rtpAudioClient?.Close();
+
+                _rtpVideoClient = new UdpClient();
+                _rtpVideoClient.Connect(ipTarget, _videoUdpPort);
+                AgregarLog($"✅ Socket UDP Vídeo abierto hacia {ipTarget}:{_videoUdpPort}");
+
+                if (_audioUdpPort > 0)
+                {
+                    _rtpAudioClient = new UdpClient();
+                    _rtpAudioClient.Connect(ipTarget, _audioUdpPort);
+                    AgregarLog($"✅ Socket UDP Audio abierto hacia {ipTarget}:{_audioUdpPort}");
+                }
+
+                _rtpCts?.Cancel();
+                _rtpCts = new CancellationTokenSource();
+                var token = _rtpCts.Token;
+
+                // Transmisión en segundo plano de paquetes RTP de prueba (~30 FPS)
+                _ = Task.Run(async () =>
+                {
+                    // Cabecera NAL de prueba H.264 (SPS/PPS dummy)
+                    byte[] dummyNal = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x80, 0x1F, 0xDA, 0x01, 0x40, 0x16, 0xEC, 0x04, 0x40 };
+                    byte[] dummyAudio = new byte[] { 0xFF, 0xF1, 0x50, 0x80, 0x02, 0x1F, 0xFC };
+
+                    while (!token.IsCancellationRequested && _rtpVideoClient != null)
+                    {
+                        try
+                        {
+                            // Enviar paquete RTP de vídeo (Payload Type 96 - H.264)
+                            byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: dummyNal);
+                            await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
+                            videoTs += 3000; // Incremento a 30 FPS (90000 / 30)
+
+                            // Enviar paquete RTP de audio (Payload Type 97 - AAC) si el puerto está configurado
+                            if (_rtpAudioClient != null && _audioUdpPort > 0)
+                            {
+                                byte[] rtpAudioPacket = ConstruirPaqueteRtp(payloadType: 97, sequenceNumber: audioSeq++, timestamp: audioTs, ssrc: ssrc, payloadData: dummyAudio);
+                                await _rtpAudioClient.SendAsync(rtpAudioPacket, rtpAudioPacket.Length);
+                                audioTs += 1024;
+                            }
+                        }
+                        catch { }
+
+                        await Task.Delay(33, token); // ~30 FPS
+                    }
+                }, token);
+            }
+            catch (Exception ex)
+            {
+                AgregarLog($"❌ Error al iniciar transporte RTP UDP: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Construye una cabecera RFC 3550 de 12 bytes + payload de datos.
+        /// </summary>
+        private byte[] ConstruirPaqueteRtp(byte payloadType, ushort sequenceNumber, uint timestamp, uint ssrc, byte[] payloadData)
+        {
+            byte[] packet = new byte[12 + payloadData.Length];
+            packet[0] = 0x80; // V=2, P=0, X=0, CC=0
+            packet[1] = (byte)(payloadType & 0x7F); // M=0, PT=payloadType
+            packet[2] = (byte)(sequenceNumber >> 8);
+            packet[3] = (byte)(sequenceNumber & 0xFF);
+            packet[4] = (byte)(timestamp >> 24);
+            packet[5] = (byte)(timestamp >> 16);
+            packet[6] = (byte)(timestamp >> 8);
+            packet[7] = (byte)(timestamp & 0xFF);
+            packet[8] = (byte)(ssrc >> 24);
+            packet[9] = (byte)(ssrc >> 16);
+            packet[10] = (byte)(ssrc >> 8);
+            packet[11] = (byte)(ssrc & 0xFF);
+
+            Array.Copy(payloadData, 0, packet, 12, payloadData.Length);
+            return packet;
+        }
+
+        /// <summary>
+        /// Copia todo el contenido del cuadro de logs al portapapeles.
+        /// </summary>
+        private void BtnCopiarLog_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Clipboard.SetText(TxtLogs.Text);
+                AgregarLog("Log copiado al portapapeles");
+            }
+            catch (Exception ex)
+            {
+                AgregarLog($"Error al copiar log: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Limpia todo el texto del cuadro de logs.
+        /// </summary>
+        private void BtnLimpiarLog_Click(object sender, RoutedEventArgs e)
+        {
+            TxtLogs.Clear();
         }
     }
 }
