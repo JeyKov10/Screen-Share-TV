@@ -20,6 +20,8 @@ namespace LGCastPC
         private CancellationTokenSource? _cts;
         private int _nextRequestId = 0;
         private string _estadoConexion = "UNCONNECTED";
+        private int _videoUdpPort = 0;
+        private int _audioUdpPort = 0;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _respuestasPendientes = new();
         private readonly string _clientKeyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientkey.txt");
 
@@ -317,14 +319,28 @@ namespace LGCastPC
                 // Procesamiento reactivo de comandos enviados por la TV (LGCastCommand / handleCommand)
                 if (root.TryGetProperty("payload", out var payload))
                 {
+                    if (payload.TryGetProperty("videoUdpPort", out var vPortElem) && vPortElem.TryGetInt32(out int vPort))
+                    {
+                        _videoUdpPort = vPort;
+                        AgregarLog($"[TV CAPABILITY] videoUdpPort registrado: {_videoUdpPort}");
+                    }
+
+                    if (payload.TryGetProperty("audioUdpPort", out var aPortElem) && aPortElem.TryGetInt32(out int aPort))
+                    {
+                        _audioUdpPort = aPort;
+                        AgregarLog($"[TV CAPABILITY] audioUdpPort registrado: {_audioUdpPort}");
+                    }
+
                     if (payload.TryGetProperty("cmd", out var cmdElem))
                     {
                         string cmdRecibido = cmdElem.GetString() ?? "";
-                        AgregarLog($"[TV COMMAND RECIBIDO]: cmd='{cmdRecibido}'");
-
                         if (cmdRecibido.Equals("PLAY", StringComparison.OrdinalIgnoreCase))
                         {
-                            AgregarLog(">>> [TV EVENTO] La TV ha enviado el comando PLAY. Sesión de streaming autorizada. <<<");
+                            HandlePlayCommand(json, payload);
+                        }
+                        else
+                        {
+                            AgregarLog($"[TV COMMAND RECIBIDO]: cmd='{cmdRecibido}'");
                         }
                     }
 
@@ -355,6 +371,31 @@ namespace LGCastPC
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Procesa el comando PLAY enviado por la TV a través de la suscripción getCommand (MirroringService.onReceivePlayCommand).
+        /// Intercepta el comando antes del inicio de la captura y transmisión de paquetes RTP.
+        /// </summary>
+        private void HandlePlayCommand(string json, JsonElement payload)
+        {
+            string clientKeyStr = "";
+            if (payload.TryGetProperty("clientKey", out var keyElem))
+            {
+                clientKeyStr = keyElem.GetString() ?? "";
+            }
+            if (string.IsNullOrEmpty(clientKeyStr))
+            {
+                clientKeyStr = CargarClientKey();
+            }
+
+            AgregarLog("\n==================================================");
+            AgregarLog(">>> [TV COMMAND RECIBIDO]: cmd='PLAY' <<<");
+            AgregarLog($"[TIMESTAMP]: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+            AgregarLog($"[CLIENTKEY]: {clientKeyStr}");
+            AgregarLog($"[VIDEO UDP PORT ACTUAL]: {(_videoUdpPort > 0 ? _videoUdpPort.ToString() : "No registrado")}");
+            AgregarLog($"[AUDIO UDP PORT ACTUAL]: {(_audioUdpPort > 0 ? _audioUdpPort.ToString() : "No registrado")}");
+            AgregarLog("==================================================\n");
         }
 
         /// <summary>
@@ -967,17 +1008,64 @@ namespace LGCastPC
             AgregarLog("\n[FLUJO APK] Transmitiendo SET_PARAMETER (setSourceDeviceCapability REA):");
             AgregarLog($"JSON enviado: {jsonSetParam}");
 
+            var setParamTcs = new TaskCompletionSource<string>();
+            _respuestasPendientes[id.ToString()] = setParamTcs;
+
             try
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(jsonSetParam);
                 await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
 
+                var setRes = await Task.WhenAny(setParamTcs.Task, Task.Delay(3000));
+                if (setRes == setParamTcs.Task)
+                {
+                    AgregarLog($"[FLUJO APK] Respuesta SET_PARAMETER recibida: {setParamTcs.Task.Result}");
+                }
+
                 // Iniciar temporizador KEEPALIVE cada 60s
                 IniciarKeepAliveTimer(clientKey);
+
+                // Transmitir inmediatamente PLAY (LGCastCommand.sendPlay REA)
+                await EnviarPlayAsync(clientKey);
             }
             catch (Exception ex)
             {
                 AgregarLog($"Error enviando SET_PARAMETER: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Transmite el comando PLAY (LGCastCommand.sendPlay REA) a ssap://com.webos.service.appcasting/sendCommand
+        /// inmediatamente después de SET_PARAMETER exitoso.
+        /// </summary>
+        private async Task EnviarPlayAsync(string clientKey)
+        {
+            if (_webSocket == null || _webSocket.State != WebSocketState.Open) return;
+
+            int id = ObtenerSiguienteIdInt();
+            string uri = "ssap://com.webos.service.appcasting/sendCommand";
+
+            string jsonPlay = "{" +
+                $"\"id\":{id}," +
+                "\"type\":\"request\"," +
+                $"\"uri\":\"{uri}\"," +
+                "\"payload\":{" +
+                    "\"cmd\":\"PLAY\"," +
+                    $"\"clientKey\":\"{clientKey}\"" +
+                "}" +
+            "}";
+
+            AgregarLog("\n[FLUJO APK] Transmitiendo PLAY (sendPlay REA):");
+            AgregarLog($"JSON enviado: {jsonPlay}");
+
+            try
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(jsonPlay);
+                await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                AgregarLog($"Error enviando PLAY: {ex.Message}");
             }
         }
 
