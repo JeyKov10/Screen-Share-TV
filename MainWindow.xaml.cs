@@ -911,7 +911,8 @@ namespace LGCastPC
         }
 
         /// <summary>
-        /// Transmite SET_PARAMETER con id entero e inicia el temporizador KEEPALIVE cada 60s (ConnectionManager).
+        /// Transmite SET_PARAMETER con la estructura exacta de LGCastCommand.sendSetParameter(),
+        /// MirroringSourceCapability y MobileDescription descompilados con REA.
         /// </summary>
         private async Task EjecutarSetParameterAsync(string clientKey)
         {
@@ -926,14 +927,44 @@ namespace LGCastPC
                 $"\"uri\":\"{uri}\"," +
                 "\"payload\":{" +
                     "\"cmd\":\"SET_PARAMETER\"," +
-                    "\"service\":\"mirroring\"," +
                     $"\"clientKey\":\"{clientKey}\"," +
-                    "\"mirroring\":{{\"displayOrientation\":\"LANDSCAPE\"}}," +
-                    "\"deviceInfo\":{{\"osType\":\"Android\",\"modelName\":\"PC\"}}" +
+                    "\"mirroring\":{" +
+                        "\"video\":{" +
+                            "\"codec\":\"H264\"," +
+                            "\"clockRate\":90000," +
+                            "\"framerate\":30," +
+                            "\"bitrate\":10000000," +
+                            "\"width\":1920," +
+                            "\"height\":1080," +
+                            "\"activeWidth\":1920," +
+                            "\"activeHeight\":1080," +
+                            "\"orientation\":\"LANDSCAPE\"" +
+                        "}," +
+                        "\"audio\":{" +
+                            "\"codec\":\"AAC\"," +
+                            "\"clockRate\":90000," +
+                            "\"frequency\":48000," +
+                            "\"streamMuxConfig\":\"1210\"," +
+                            "\"channels\":2" +
+                        "}," +
+                        "\"crypto\":[]," +
+                        "\"uibcEnabled\":true," +
+                        "\"supportedFeatures\":{" +
+                            "\"screenOrientation\":\"PORTRAIT,LANDSCAPE\"" +
+                        "}" +
+                    "}," +
+                    "\"deviceInfo\":{" +
+                        "\"type\":\"phone\"," +
+                        "\"platform\":\"android\"," +
+                        "\"version\":\"1.0.0\"," +
+                        "\"manufacturer\":\"LG\"," +
+                        "\"modelName\":\"PC\"," +
+                        "\"deviceName\":\"PC\"" +
+                    "}" +
                 "}" +
             "}";
 
-            AgregarLog("\n[FLUJO APK] Transmitiendo SET_PARAMETER (setSourceDeviceCapability):");
+            AgregarLog("\n[FLUJO APK] Transmitiendo SET_PARAMETER (setSourceDeviceCapability REA):");
             AgregarLog($"JSON enviado: {jsonSetParam}");
 
             try
