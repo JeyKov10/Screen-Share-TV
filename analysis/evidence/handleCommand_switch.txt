@@ -1,0 +1,184 @@
+=== EVIDENCIA REA: ANALISIS DE ConnectionManager.handleCommand(JSONObject) ===
+Offset: 0x00424ccc | LÃ­neas DEX: 1167495 - 1167675
+
+[1167495]       name          : 'handleCommand'
+[1167496]       type          : '(Lorg/json/JSONObject;)V'
+[1167497]       access        : 0x0002 (PRIVATE)
+[1167498]       code          -
+[1167499]       registers     : 6
+[1167500]       ins           : 2
+[1167501]       outs          : 3
+[1167502]       insns size    : 214 16-bit code units
+[1167503] 424ccc:                                        |[424ccc] com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.handleCommand:(Lorg/json/JSONObject;)V
+[1167504] 424cdc: 1a00 829a                              |0000: const-string v0, "cmd" // string@9a82
+[1167505] 424ce0: 6e20 4efc 0500                         |0002: invoke-virtual {v5, v0}, Lorg/json/JSONObject;.optString:(Ljava/lang/String;)Ljava/lang/String; // method@fc4e
+[1167506] 424ce6: 0c00                                   |0005: move-result-object v0
+[1167507] 424ce8: 1a01 269a                              |0006: const-string v1, "clientKey" // string@9a26
+[1167508] 424cec: 6e20 4efc 1500                         |0008: invoke-virtual {v5, v1}, Lorg/json/JSONObject;.optString:(Ljava/lang/String;)Ljava/lang/String; // method@fc4e
+[1167509] 424cf2: 0c01                                   |000b: move-result-object v1
+[1167510] 424cf4: 1a02 b4c3                              |000c: const-string v2, "handleCommand (%s)" // string@c3b4
+[1167511] 424cf8: 2410 cd2b 0000                         |000e: filled-new-array {v0}, [Ljava/lang/Object; // type@2bcd
+[1167512] 424cfe: 0c03                                   |0011: move-result-object v3
+[1167513] 424d00: 7120 2e89 3200                         |0012: invoke-static {v2, v3}, Lcom/connectsdk/service/webos/lgcast/common/utils/Logger;.print:(Ljava/lang/String;[Ljava/lang/Object;)V // method@892e
+[1167514] 424d06: 5442 eb69                              |0015: iget-object v2, v4, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mLGCastCommand:Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand; // field@69eb
+[1167515] 424d0a: 3902 0400                              |0017: if-nez v2, 001b // +0004
+[1167516] 424d0e: 2900 6f00                              |0019: goto/16 0088 // +006f
+[1167517] 424d12: 3800 8600                              |001b: if-eqz v0, 00a1 // +0086
+[1167518] 424d16: 3901 0400                              |001d: if-nez v1, 0021 // +0004
+[1167519] 424d1a: 2900 8200                              |001f: goto/16 00a1 // +0082
+[1167520] 424d1e: 6e10 0f88 0200                         |0021: invoke-virtual {v2}, Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand;.getClientKey:()Ljava/lang/String; // method@880f
+[1167521] 424d24: 0c02                                   |0024: move-result-object v2
+[1167522] 424d26: 6e20 66f5 2100                         |0025: invoke-virtual {v1, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167523] 424d2c: 0a02                                   |0028: move-result v2
+[1167524] 424d2e: 3902 1200                              |0029: if-nez v2, 003b // +0012
+[1167525] 424d32: 5445 eb69                              |002b: iget-object v5, v4, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mLGCastCommand:Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand; // field@69eb
+[1167526] 424d36: 6e10 0f88 0500                         |002d: invoke-virtual {v5}, Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand;.getClientKey:()Ljava/lang/String; // method@880f
+[1167527] 424d3c: 0c05                                   |0030: move-result-object v5
+[1167528] 424d3e: 2420 cd2b 5100                         |0031: filled-new-array {v1, v5}, [Ljava/lang/Object; // type@2bcd
+[1167529] 424d44: 0c05                                   |0034: move-result-object v5
+[1167530] 424d46: 1a00 5f21                              |0035: const-string v0, "Client key not matched (%s, %s)" // string@215f
+[1167531] 424d4a: 7120 2b89 5000                         |0037: invoke-static {v0, v5}, Lcom/connectsdk/service/webos/lgcast/common/utils/Logger;.error:(Ljava/lang/String;[Ljava/lang/Object;)V // method@892b
+[1167532] 424d50: 0e00                                   |003a: return-void
+[1167533] 424d52: 12f1                                   |003b: const/4 v1, #int -1 // #ff
+[1167534] 424d54: 6e10 6ef5 0000                         |003c: invoke-virtual {v0}, Ljava/lang/String;.hashCode:()I // method@f56e
+[1167535] 424d5a: 0a02                                   |003f: move-result v2
+[1167536] 424d5c: 2c02 6c00 0000                         |0040: sparse-switch v2, 000000ac // +0000006c
+[1167537] 424d62: 2842                                   |0043: goto 0085 // +0042
+[1167538] 424d64: 1a02 6b6a                              |0044: const-string v2, "PAUSE" // string@6a6b
+[1167539] 424d68: 6e20 66f5 2000                         |0046: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167540] 424d6e: 0a00                                   |0049: move-result v0
+[1167541] 424d70: 3900 0300                              |004a: if-nez v0, 004d // +0003
+[1167542] 424d74: 2839                                   |004c: goto 0085 // +0039
+[1167543] 424d76: 1251                                   |004d: const/4 v1, #int 5 // #5
+[1167544] 424d78: 2837                                   |004e: goto 0085 // +0037
+[1167545] 424d7a: 1a02 c871                              |004f: const-string v2, "SET_PARAMETER" // string@71c8
+[1167546] 424d7e: 6e20 66f5 2000                         |0051: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167547] 424d84: 0a00                                   |0054: move-result v0
+[1167548] 424d86: 3900 0300                              |0055: if-nez v0, 0058 // +0003
+[1167549] 424d8a: 282e                                   |0057: goto 0085 // +002e
+[1167550] 424d8c: 1241                                   |0058: const/4 v1, #int 4 // #4
+[1167551] 424d8e: 282c                                   |0059: goto 0085 // +002c
+[1167552] 424d90: 1a02 1f73                              |005a: const-string v2, "STOP" // string@731f
+[1167553] 424d94: 6e20 66f5 2000                         |005c: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167554] 424d9a: 0a00                                   |005f: move-result v0
+[1167555] 424d9c: 3900 0300                              |0060: if-nez v0, 0063 // +0003
+[1167556] 424da0: 2823                                   |0062: goto 0085 // +0023
+[1167557] 424da2: 1231                                   |0063: const/4 v1, #int 3 // #3
+[1167558] 424da4: 2821                                   |0064: goto 0085 // +0021
+[1167559] 424da6: 1a02 a46a                              |0065: const-string v2, "PLAY" // string@6aa4
+[1167560] 424daa: 6e20 66f5 2000                         |0067: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167561] 424db0: 0a00                                   |006a: move-result v0
+[1167562] 424db2: 3900 0300                              |006b: if-nez v0, 006e // +0003
+[1167563] 424db6: 2818                                   |006d: goto 0085 // +0018
+[1167564] 424db8: 1221                                   |006e: const/4 v1, #int 2 // #2
+[1167565] 424dba: 2816                                   |006f: goto 0085 // +0016
+[1167566] 424dbc: 1a02 312e                              |0070: const-string v2, "GET_PARAMETER" // string@2e31
+[1167567] 424dc0: 6e20 66f5 2000                         |0072: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167568] 424dc6: 0a00                                   |0075: move-result v0
+[1167569] 424dc8: 3900 0300                              |0076: if-nez v0, 0079 // +0003
+[1167570] 424dcc: 280d                                   |0078: goto 0085 // +000d
+[1167571] 424dce: 1211                                   |0079: const/4 v1, #int 1 // #1
+[1167572] 424dd0: 280b                                   |007a: goto 0085 // +000b
+[1167573] 424dd2: 1a02 0a77                              |007b: const-string v2, "TEARDOWN" // string@770a
+[1167574] 424dd6: 6e20 66f5 2000                         |007d: invoke-virtual {v0, v2}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@f566
+[1167575] 424ddc: 0a00                                   |0080: move-result v0
+[1167576] 424dde: 3900 0300                              |0081: if-nez v0, 0084 // +0003
+[1167577] 424de2: 2802                                   |0083: goto 0085 // +0002
+[1167578] 424de4: 1201                                   |0084: const/4 v1, #int 0 // #0
+[1167579] 424de6: 2b01 4100 0000                         |0085: packed-switch v1, 000000c6 // +00000041
+[1167580] 424dec: 0e00                                   |0088: return-void
+[1167581] 424dee: 7020 d587 5400                         |0089: invoke-direct {v4, v5}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnReceiveSetParameter:(Lorg/json/JSONObject;)V // method@87d5
+[1167582] 424df4: 0e00                                   |008c: return-void
+[1167583] 424df6: 7020 d687 5400                         |008d: invoke-direct {v4, v5}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnReceiveStopCommand:(Lorg/json/JSONObject;)V // method@87d6
+[1167584] 424dfc: 0e00                                   |0090: return-void
+[1167585] 424dfe: 7020 d487 5400                         |0091: invoke-direct {v4, v5}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnReceivePlayCommand:(Lorg/json/JSONObject;)V // method@87d4
+[1167586] 424e04: 0e00                                   |0094: return-void
+[1167587] 424e06: 7020 d387 5400                         |0095: invoke-direct {v4, v5}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnReceiveGetParameter:(Lorg/json/JSONObject;)V // method@87d3
+[1167588] 424e0c: 0e00                                   |0098: return-void
+[1167589] 424e0e: 6205 f269                              |0099: sget-object v5, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError;.RENDERER_TERMINATED:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError; // field@69f2
+[1167590] 424e12: 1a00 44eb                              |009b: const-string v0, "renderer terminated" // string@eb44
+[1167591] 424e16: 7030 d087 5400                         |009d: invoke-direct {v4, v5, v0}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnError:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError;Ljava/lang/String;)V // method@87d0
+[1167592] 424e1c: 0e00                                   |00a0: return-void
+[1167593] 424e1e: 1a05 e133                              |00a1: const-string v5, "Invalid command (%s, %s)" // string@33e1
+[1167594] 424e22: 2420 cd2b 1000                         |00a3: filled-new-array {v0, v1}, [Ljava/lang/Object; // type@2bcd
+[1167595] 424e28: 0c00                                   |00a6: move-result-object v0
+[1167596] 424e2a: 7120 2b89 0500                         |00a7: invoke-static {v5, v0}, Lcom/connectsdk/service/webos/lgcast/common/utils/Logger;.error:(Ljava/lang/String;[Ljava/lang/Object;)V // method@892b
+[1167597] 424e30: 0e00                                   |00aa: return-void
+[1167598] 424e32: 0000                                   |00ab: nop // spacer
+[1167599] 424e34: 0002 0600 0456 7fcb c0c5 1ad6 3483 ... |00ac: sparse-switch-data (26 units)
+[1167600] 424e68: 0001 0600 0000 0000 1400 0000 1000 ... |00c6: packed-switch-data (16 units)
+[1167601]       catches       : (none)
+[1167602]       positions     :
+[1167603]       locals        :
+[1167604] 
+[1167605]     #20              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167606]       name          : 'handleSubscribed'
+[1167607]       type          : '(Lorg/json/JSONObject;)V'
+[1167608]       access        : 0x0002 (PRIVATE)
+[1167609]       code          -
+[1167610]       registers     : 5
+[1167611]       ins           : 2
+[1167612]       outs          : 3
+[1167613]       insns size    : 27 16-bit code units
+[1167614] 424e88:                                        |[424e88] com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.handleSubscribed:(Lorg/json/JSONObject;)V
+[1167615] 424e98: 1200                                   |0000: const/4 v0, #int 0 // #0
+[1167616] 424e9a: 2301 cd2b                              |0001: new-array v1, v0, [Ljava/lang/Object; // type@2bcd
+[1167617] 424e9e: 1a02 e5c3                              |0003: const-string v2, "handleSubscribed" // string@c3e5
+[1167618] 424ea2: 7120 2e89 1200                         |0005: invoke-static {v2, v1}, Lcom/connectsdk/service/webos/lgcast/common/utils/Logger;.print:(Ljava/lang/String;[Ljava/lang/Object;)V // method@892e
+[1167619] 424ea8: 1a01 f8fd                              |0008: const-string v1, "subscribed" // string@fdf8
+[1167620] 424eac: 6e30 46fc 1400                         |000a: invoke-virtual {v4, v1, v0}, Lorg/json/JSONObject;.optBoolean:(Ljava/lang/String;Z)Z // method@fc46
+[1167621] 424eb2: 0a04                                   |000d: move-result v4
+[1167622] 424eb4: 1210                                   |000e: const/4 v0, #int 1 // #1
+[1167623] 424eb6: 3304 0600                              |000f: if-ne v4, v0, 0015 // +0006
+[1167624] 424eba: 7010 f287 0300                         |0011: invoke-direct {v3}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.sendConnect:()V // method@87f2
+[1167625] 424ec0: 0e00                                   |0014: return-void
+[1167626] 424ec2: 1a04 dbfd                              |0015: const-string v4, "subscribe failure" // string@fddb
+[1167627] 424ec6: 7020 cf87 4300                         |0017: invoke-direct {v3, v4}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.callOnConnectionFailed:(Ljava/lang/String;)V // method@87cf
+[1167628] 424ecc: 0e00                                   |001a: return-void
+[1167629]       catches       : (none)
+[1167630]       positions     :
+[1167631]       locals        :
+[1167632] 
+[1167633]     #21              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167634]       name          : 'i'
+[1167635]       type          : '(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError;Ljava/lang/String;)V'
+[1167636]       access        : 0x1009 (PUBLIC STATIC SYNTHETIC)
+[1167637]       code          -
+[1167638]       registers     : 3
+[1167639]       ins           : 3
+[1167640]       outs          : 3
+[1167641]       insns size    : 6 16-bit code units
+[1167642] 4247f8:                                        |[4247f8] com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.i:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError;Ljava/lang/String;)V
+[1167643] 424808: 5400 e769                              |0000: iget-object v0, v0, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mConnectionManagerListener:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerListener; // field@69e7
+[1167644] 42480c: 7230 fe87 1002                         |0002: invoke-interface {v0, v1, v2}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerListener;.onError:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerError;Ljava/lang/String;)V // method@87fe
+[1167645] 424812: 0e00                                   |0005: return-void
+[1167646]       catches       : (none)
+[1167647]       positions     :
+[1167648]       locals        :
+[1167649] 
+[1167650]     #22              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167651]       name          : 'j'
+[1167652]       type          : '(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V'
+[1167653]       access        : 0x1009 (PUBLIC STATIC SYNTHETIC)
+[1167654]       code          -
+[1167655]       registers     : 4
+[1167656]       ins           : 2
+[1167657]       outs          : 4
+[1167658]       insns size    : 9 16-bit code units
+[1167659] 424814:                                        |[424814] com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.j:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V
+[1167660] 424824: 5420 eb69                              |0000: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mLGCastCommand:Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand; // field@69eb
+[1167661] 424828: 5422 ec69                              |0002: iget-object v2, v2, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mServiceName:Ljava/lang/String; // field@69ec
+[1167662] 42482c: 1201                                   |0004: const/4 v1, #int 0 // #0
+[1167663] 42482e: 6e40 1788 2013                         |0005: invoke-virtual {v0, v2, v3, v1}, Lcom/connectsdk/service/webos/lgcast/common/connection/LGCastCommand;.sendSetParameter:(Ljava/lang/String;Lorg/json/JSONObject;Lorg/json/JSONObject;)Z // method@8817
+[1167664] 424834: 0e00                                   |0008: return-void
+[1167665]       catches       : (none)
+[1167666]       positions     :
+[1167667]       locals        :
+[1167668] 
+[1167669]     #23              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167670]       name          : 'k'
+[1167671]       type          : '(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;Lorg/json/JSONObject;)V'
+[1167672]       access        : 0x1009 (PUBLIC STATIC SYNTHETIC)
+[1167673]       code          -
+[1167674]       registers     : 4
+[1167675]       ins           : 3

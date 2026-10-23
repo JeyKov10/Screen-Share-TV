@@ -1,0 +1,81 @@
+=== EVIDENCIA REA: XREFS NATIVOS A ConnectionManager.n(...) ===
+Objetivo: ConnectionManager.n:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V
+Total de Invocaciones Directas (invoke-static): 1
+Clase Llamadora: hna.aa.a (Lambda / Runnable desazucarado de ConnectionManager)
+MÃ©todo Llamador: public final void hna.aa.a.run()
+Offset DEX: 0x005fd2c0 (LÃ­nea 2141202 - 2141206)
+
+==================================================
+1. INVOCADOR DIRECTO (invoke-static en hna.aa.a.run):
+==================================================
+[2141180]       ins           : 3
+[2141181]       outs          : 1
+[2141182]       insns size    : 8 16-bit code units
+[2141183] 5fd2a0:                                        |[5fd2a0] hna.aa.a.<init>:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V
+[2141184] 5fd2b0: 7010 29f5 0000                         |0000: invoke-direct {v0}, Ljava/lang/Object;.<init>:()V // method@f529
+[2141185] 5fd2b6: 5b01 3cfd                              |0003: iput-object v1, v0, Lhna/aa/a;.d:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager; // field@fd3c
+[2141186] 5fd2ba: 5b02 3dfd                              |0005: iput-object v2, v0, Lhna/aa/a;.e:Lorg/json/JSONObject; // field@fd3d
+[2141187] 5fd2be: 0e00                                   |0007: return-void
+[2141188]       catches       : (none)
+[2141189]       positions     :
+[2141190]       locals        :
+[2141191] 
+[2141192]   Virtual methods   -
+[2141193]     #0              : (in Lhna/aa/a;)
+[2141194]       name          : 'run'
+[2141195]       type          : '()V'
+[2141196]       access        : 0x0011 (PUBLIC FINAL)
+[2141197]       code          -
+[2141198]       registers     : 3
+[2141199]       ins           : 1
+[2141200]       outs          : 2
+[2141201]       insns size    : 8 16-bit code units
+[2141202] 5fd2c0:                                        |[5fd2c0] hna.aa.a.run:()V
+[2141203] 5fd2d0: 5420 3cfd                              |0000: iget-object v0, v2, Lhna/aa/a;.d:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager; // field@fd3c
+[2141204] 5fd2d4: 5421 3dfd                              |0002: iget-object v1, v2, Lhna/aa/a;.e:Lorg/json/JSONObject; // field@fd3d
+[2141205] 5fd2d8: 7120 e587 1000                         |0004: invoke-static {v0, v1}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.n:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V // method@87e5
+[2141206] 5fd2de: 0e00                                   |0007: return-void
+[2141207]       catches       : (none)
+[2141208]       positions     :
+[2141209]       locals        :
+[2141210] 
+[2141211]   source_file_idx   : 30059 (SourceFile)
+[2141212] 
+[2141213] Class #8312            -
+[2141214]   Class descriptor  : 'Lhna/aa/b;'
+[2141215]   Access flags      : 0x1011 (PUBLIC FINAL SYNTHETIC)
+
+==================================================
+2. INSTANCIADOR DEL RUNNABLE (invoke-direct hna.aa.a.<init> en ConnectionManager):
+==================================================
+[1167180]       locals        :
+[1167181] 
+[1167182]     #4              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167183]       name          : 'callOnConnectionCompleted'
+[1167184]       type          : '(Lorg/json/JSONObject;)V'
+[1167185]       access        : 0x0002 (PRIVATE)
+[1167186]       code          -
+[1167187]       registers     : 4
+[1167188]       ins           : 2
+[1167189]       outs          : 3
+[1167190]       insns size    : 17 16-bit code units
+[1167191] 424a28:                                        |[424a28] com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.callOnConnectionCompleted:(Lorg/json/JSONObject;)V
+[1167192] 424a38: 5420 e669                              |0000: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mConnectionHandler:Lcom/connectsdk/service/webos/lgcast/common/utils/HandlerThreadEx; // field@69e6
+[1167193] 424a3c: 3800 0a00                              |0002: if-eqz v0, 000c // +000a
+[1167194] 424a40: 2201 4124                              |0004: new-instance v1, Lhna/aa/a; // type@2441
+[1167195] 424a44: 7030 b7ef 2103                         |0006: invoke-direct {v1, v2, v3}, Lhna/aa/a;.<init>:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V // method@efb7
+[1167196] 424a4a: 6e20 f888 1000                         |0009: invoke-virtual {v0, v1}, Lcom/connectsdk/service/webos/lgcast/common/utils/HandlerThreadEx;.post:(Ljava/lang/Runnable;)V // method@88f8
+[1167197] 424a50: 6203 d269                              |000c: sget-object v3, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager$ConnectionState;.CONNECTED:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager$ConnectionState; // field@69d2
+[1167198] 424a54: 5b23 e869                              |000e: iput-object v3, v2, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mCurrentState:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager$ConnectionState; // field@69e8
+[1167199] 424a58: 0e00                                   |0010: return-void
+[1167200]       catches       : (none)
+[1167201]       positions     :
+[1167202]       locals        :
+[1167203] 
+[1167204]     #5              : (in Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;)
+[1167205]       name          : 'callOnConnectionFailed'
+[1167206]       type          : '(Ljava/lang/String;)V'
+[1167207]       access        : 0x0002 (PRIVATE)
+[1167208]       code          -
+[1167209]       registers     : 4
+[1167210]       ins           : 2

@@ -1,0 +1,79 @@
+=== EVIDENCIA REA: FLUJO DE RECEPCIÓN Y CALLBACKS EN CONNECTIONMANAGER ===
+
+1. LLAMADOR SINTÉTICO EN ConnectionManager:
+Class: com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager
+Method: synthetic void n(ConnectionManager cm, org.json.JSONObject json)
+Offset: 0x004248f0 (classes15.dex)
+
+Bytecode:
+4248f0: com.connectsdk.service.webos.lgcast.common.connection.ConnectionManager.n:(Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;Lorg/json/JSONObject;)V
+424900: iget-object v0, v0, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.mConnectionManagerListener:Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerListener;
+424904: invoke-interface {v0, v1}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManagerListener;.onConnectionCompleted:(Lorg/json/JSONObject;)V
+42490a: return-void
+
+2. IMPLEMENTACIÓN DEL CALLBACK EN MirroringService$1:
+Class: com.connectsdk.service.webos.lgcast.screenmirroring.service.MirroringService$1
+Method: public void onConnectionCompleted(org.json.JSONObject json)
+Offset: 0x0042f97c (classes15.dex)
+
+Bytecode:
+42f97c: com.connectsdk.service.webos.lgcast.screenmirroring.service.MirroringService$1.onConnectionCompleted:(Lorg/json/JSONObject;)V
+42f98c: const/4 v0, #int 0
+42f98e: new-array v0, v0, [Ljava/lang/Object;
+42f992: const-string v1, "onConnectionCompleted"
+42f996: invoke-static {v1, v0}, Lcom/connectsdk/service/webos/lgcast/common/utils/Logger;.debug:(Ljava/lang/String;[Ljava/lang/Object;)V
+42f99c: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9a0: new-instance v1, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42f9a4: invoke-direct {v1, v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;.<init>:(Lorg/json/JSONObject;)V
+42f9aa: invoke-static {v0, v1}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$102:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42f9b0: iget-object v3, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9b4: invoke-static {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$100:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42f9ba: move-result-object v3
+42f9bc: sget-object v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$Test;.displayOrientation:Ljava/lang/String;
+42f9c0: if-eqz v0, 001d
+42f9c4: goto 0025
+42f9c6: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9ca: invoke-static {v0}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$100:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42f9d0: move-result-object v0
+42f9d2: iget-object v0, v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;.displayOrientation:Ljava/lang/String;
+42f9d6: iput-object v0, v3, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;.displayOrientation:Ljava/lang/String;
+42f9da: iget-object v3, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9de: invoke-static {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$100:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42f9e4: move-result-object v3
+42f9e6: invoke-virtual {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;.debug:()V
+42f9ec: iget-object v3, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9f0: invoke-virtual {v3}, Landroid/content/ContextWrapper;.getBaseContext:()Landroid/content/Context;
+42f9f6: move-result-object v0
+42f9f8: iget-object v1, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42f9fc: invoke-static {v1}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$100:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42fa02: move-result-object v1
+42fa04: invoke-static {v0, v1}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringServiceFunc;.createMirroringSourceCapa:(Landroid/content/Context;Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;
+42fa0a: move-result-object v0
+42fa0c: invoke-static {v3, v0}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$202:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;
+42fa12: iget-object v3, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42fa16: invoke-static {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$200:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;
+42fa1c: move-result-object v3
+42fa1e: invoke-virtual {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;.debug:()V
+42fa24: new-instance v3, Lcom/connectsdk/service/webos/lgcast/common/connection/MobileDescription;
+42fa28: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42fa2c: invoke-virtual {v0}, Landroid/content/ContextWrapper;.getBaseContext:()Landroid/content/Context;
+42fa32: move-result-object v0
+42fa34: invoke-direct {v3, v0}, Lcom/connectsdk/service/webos/lgcast/common/connection/MobileDescription;.<init>:(Landroid/content/Context;)V
+42fa3a: invoke-virtual {v3}, Lcom/connectsdk/service/webos/lgcast/common/connection/MobileDescription;.debug:()V
+42fa40: iget-object v0, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42fa44: invoke-static {v0}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$300:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;
+42fa4a: move-result-object v0
+42fa4c: iget-object v1, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42fa50: invoke-static {v1}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$200:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;
+42fa56: move-result-object v1
+42fa58: invoke-virtual {v1}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;.toJSONObject:()Lorg/json/JSONObject;
+42fa5e: move-result-object v1
+42fa60: invoke-virtual {v3}, Lcom/connectsdk/service/webos/lgcast/common/connection/MobileDescription;.toJSONObject:()Lorg/json/JSONObject;
+42fa66: move-result-object v3
+42fa68: invoke-virtual {v0, v1, v3}, Lcom/connectsdk/service/webos/lgcast/common/connection/ConnectionManager;.setSourceDeviceCapability:(Lorg/json/JSONObject;Lorg/json/JSONObject;)V
+42fa6e: iget-object v3, v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService$1;.this$0:Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;
+42fa72: invoke-static {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;.access$100:(Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringService;)Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;
+42fa78: move-result-object v3
+42fa7a: iget-object v3, v3, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSinkCapability;.displayOrientation:Ljava/lang/String;
+42fa7e: invoke-static {v3}, Lcom/connectsdk/service/webos/lgcast/screenmirroring/uibc/UibcAccessibilityService;.onDisplayRotated:(Ljava/lang/String;)V
+42fa84: return-void

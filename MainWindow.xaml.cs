@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -22,6 +23,19 @@ namespace LGCastPC
         private UdpClient? _rtpVideoClient;
         private UdpClient? _rtpAudioClient;
         private CancellationTokenSource? _rtpCts;
+        private Process? _ffmpegProcess;
+        private readonly ConcurrentQueue<byte[]> _naluQueue = new();
+        private long _diagFfmpegBytesTotal = 0;
+        private long _diagNalusEnqueuedTotal = 0;
+        private long _diagNalusDequeuedTotal = 0;
+        private long _diagRtpVideoPacketsTotal = 0;
+        private long _diagNaluBytesTotal = 0;
+        private long _diagNaluSpsCount = 0;
+        private long _diagNaluPpsCount = 0;
+        private long _diagNaluIdrCount = 0;
+        private long _diagNaluNonIdrCount = 0;
+        private long _diagMaxQueueDepth = 0;
+        private long _diagNalusDroppedTotal = 0;
         private int _nextRequestId = 0;
         private string _estadoConexion = "UNCONNECTED";
         private string _tvIpAddress = "";
@@ -926,10 +940,25 @@ namespace LGCastPC
                 var connectRes = await Task.WhenAny(connectTcs.Task, Task.Delay(3000));
                 if (connectRes == connectTcs.Task)
                 {
-                    AgregarLog($"[FLUJO APK] Respuesta CONNECT recibida: {connectTcs.Task.Result}");
+                    string connectResultJson = connectTcs.Task.Result;
+                    AgregarLog($"[FLUJO APK] Respuesta CONNECT recibida: {connectResultJson}");
+
+                    if (connectResultJson.Contains("\"error\"", StringComparison.OrdinalIgnoreCase) ||
+                        connectResultJson.Contains("error", StringComparison.OrdinalIgnoreCase))
+                    {
+                        AgregarLog("❌ [FLUJO ABORTADO] Respuesta CONNECT contiene un error. Se cancelan GET_PARAMETER, SET_PARAMETER y PLAY.");
+                        CambiarEstadoConexion("CONNECT_ERROR");
+                        return; // NO ejecuta GET_PARAMETER, NO ejecuta SET_PARAMETER, NO ejecuta PLAY
+                    }
 
                     // 5. Ejecutar getParameter("mirroring") inmediatamente tras CONNECT exitoso
                     await EjecutarGetParameterAsync(keyAUsar);
+                }
+                else
+                {
+                    AgregarLog("❌ [FLUJO ABORTADO] Timeout esperando respuesta de CONNECT. Se cancelan GET_PARAMETER, SET_PARAMETER y PLAY.");
+                    CambiarEstadoConexion("CONNECT_TIMEOUT");
+                    return; // ABORTAR
                 }
             }
             catch (Exception ex)
@@ -974,10 +1003,24 @@ namespace LGCastPC
                 var paramRes = await Task.WhenAny(getParamTcs.Task, Task.Delay(3000));
                 if (paramRes == getParamTcs.Task)
                 {
-                    AgregarLog($"[FLUJO APK] Capacidades de TV (GET_PARAMETER) recibidas: {getParamTcs.Task.Result}");
+                    string getParamResultJson = getParamTcs.Task.Result;
+                    AgregarLog($"[FLUJO APK] Capacidades de TV (GET_PARAMETER) recibidas: {getParamResultJson}");
+
+                    if (getParamResultJson.Contains("\"error\"", StringComparison.OrdinalIgnoreCase))
+                    {
+                        AgregarLog("❌ [FLUJO ABORTADO] Respuesta GET_PARAMETER contiene un error. Se cancelan SET_PARAMETER y PLAY.");
+                        CambiarEstadoConexion("GET_PARAM_ERROR");
+                        return; // ABORTAR
+                    }
 
                     // 6. Transmitir SET_PARAMETER e iniciar KEEPALIVE
                     await EjecutarSetParameterAsync(clientKey);
+                }
+                else
+                {
+                    AgregarLog("❌ [FLUJO ABORTADO] Timeout esperando respuesta de GET_PARAMETER. Se cancelan SET_PARAMETER y PLAY.");
+                    CambiarEstadoConexion("GET_PARAM_TIMEOUT");
+                    return; // ABORTAR
                 }
             }
             catch (Exception ex)
@@ -1004,7 +1047,7 @@ namespace LGCastPC
                 "\"payload\":{" +
                     "\"cmd\":\"SET_PARAMETER\"," +
                     $"\"clientKey\":\"{clientKey}\"," +
-                    "\"mirroring\":{" +
+                    "\"ScreenShare\":{" +
                         "\"video\":{" +
                             "\"codec\":\"H264\"," +
                             "\"clockRate\":90000," +
@@ -1030,12 +1073,13 @@ namespace LGCastPC
                         "}" +
                     "}," +
                     "\"deviceInfo\":{" +
-                        "\"type\":\"phone\"," +
-                        "\"platform\":\"android\"," +
-                        "\"version\":\"1.0.0\"," +
-                        "\"manufacturer\":\"LG\"," +
-                        "\"modelName\":\"PC\"," +
-                        "\"deviceName\":\"PC\"" +
+                        "\"sdkVersion\":\"1.6.0\"," +
+                        "\"deviceModel\":\"PC\"," +
+                        "\"OSVersion\":\"10.0\"," +
+                        "\"resolution\":\"1920x1080\"," +
+                        "\"appId\":\"com.lgeha.nuts\"," +
+                        "\"appName\":\"LG ThinQ\"," +
+                        "\"appRegion\":\"US\"" +
                     "}" +
                 "}" +
             "}";
@@ -1464,21 +1508,95 @@ namespace LGCastPC
                 _rtpCts = new CancellationTokenSource();
                 var token = _rtpCts.Token;
 
-                // Transmisión en segundo plano de paquetes RTP de prueba (~30 FPS)
+                // Resetear contadores diagnósticos
+                Interlocked.Exchange(ref _diagFfmpegBytesTotal, 0);
+                Interlocked.Exchange(ref _diagNalusEnqueuedTotal, 0);
+                Interlocked.Exchange(ref _diagNalusDequeuedTotal, 0);
+                Interlocked.Exchange(ref _diagRtpVideoPacketsTotal, 0);
+                Interlocked.Exchange(ref _diagNaluBytesTotal, 0);
+                Interlocked.Exchange(ref _diagNaluSpsCount, 0);
+                Interlocked.Exchange(ref _diagNaluPpsCount, 0);
+                Interlocked.Exchange(ref _diagNaluIdrCount, 0);
+                Interlocked.Exchange(ref _diagNaluNonIdrCount, 0);
+                Interlocked.Exchange(ref _diagMaxQueueDepth, 0);
+                Interlocked.Exchange(ref _diagNalusDroppedTotal, 0);
+
+                // Iniciar tarea en segundo plano de informe diagnóstico (cada 1 segundo)
                 _ = Task.Run(async () =>
                 {
-                    // Cabecera NAL de prueba H.264 (SPS/PPS dummy)
-                    byte[] dummyNal = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x80, 0x1F, 0xDA, 0x01, 0x40, 0x16, 0xEC, 0x04, 0x40 };
+                    long prevFfmpegBytes = 0;
+                    long prevNalusEnqueued = 0;
+                    long prevNalusDequeued = 0;
+                    long prevRtpPackets = 0;
+
+                    while (!token.IsCancellationRequested)
+                    {
+                        await Task.Delay(1000, token);
+
+                        long currFfmpegBytes = Interlocked.Read(ref _diagFfmpegBytesTotal);
+                        long currNalusEnqueued = Interlocked.Read(ref _diagNalusEnqueuedTotal);
+                        long currNalusDequeued = Interlocked.Read(ref _diagNalusDequeuedTotal);
+                        long currRtpPackets = Interlocked.Read(ref _diagRtpVideoPacketsTotal);
+                        long totalNaluBytes = Interlocked.Read(ref _diagNaluBytesTotal);
+
+                        long bytesSec = currFfmpegBytes - prevFfmpegBytes;
+                        long enqueuedSec = currNalusEnqueued - prevNalusEnqueued;
+                        long dequeuedSec = currNalusDequeued - prevNalusDequeued;
+                        long rtpSec = currRtpPackets - prevRtpPackets;
+                        long avgNaluSize = currNalusEnqueued > 0 ? (totalNaluBytes / currNalusEnqueued) : 0;
+
+                        long sps = Interlocked.Read(ref _diagNaluSpsCount);
+                        long pps = Interlocked.Read(ref _diagNaluPpsCount);
+                        long idr = Interlocked.Read(ref _diagNaluIdrCount);
+                        long nonIdr = Interlocked.Read(ref _diagNaluNonIdrCount);
+                        long maxQueue = Interlocked.Read(ref _diagMaxQueueDepth);
+                        long droppedTotal = Interlocked.Read(ref _diagNalusDroppedTotal);
+
+                        prevFfmpegBytes = currFfmpegBytes;
+                        prevNalusEnqueued = currNalusEnqueued;
+                        prevNalusDequeued = currNalusDequeued;
+                        prevRtpPackets = currRtpPackets;
+
+                        AgregarLog($"📊 [DIAG FFMPEG->RTP 1s]: FFmpeg: {bytesSec} B/s | NALUs Detectadas: {enqueuedSec}/s (SPS:{sps}, PPS:{pps}, IDR:{idr}, NonIDR:{nonIdr}) | Cola Actual: {_naluQueue.Count} | Cola Maxima: {maxQueue} | Descartadas: {droppedTotal} | Desencoladas: {dequeuedSec}/s | Tamanio Prom NALU: {avgNaluSize} B | RTP Video: {rtpSec} pkt/s");
+                    }
+                }, token);
+
+                // Iniciar captura nativa FFmpeg en segundo plano
+                IniciarCapturaFFmpeg(token);
+
+                // Transmisión en segundo plano de paquetes RTP consumiendo TODA la cola NALU disponible
+                _ = Task.Run(async () =>
+                {
+                    byte[] fallbackNal = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x80, 0x1F, 0xDA, 0x01, 0x40, 0x16, 0xEC, 0x04, 0x40 };
                     byte[] dummyAudio = new byte[] { 0xFF, 0xF1, 0x50, 0x80, 0x02, 0x1F, 0xFC };
 
                     while (!token.IsCancellationRequested && _rtpVideoClient != null)
                     {
                         try
                         {
-                            // Enviar paquete RTP de vídeo (Payload Type 96 - H.264)
-                            byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: dummyNal);
-                            await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
-                            videoTs += 3000; // Incremento a 30 FPS (90000 / 30)
+                            bool seEnviaronNalusReales = false;
+
+                            // Consumir TODA la cola NALU disponible en este ciclo
+                            while (_naluQueue.TryDequeue(out byte[]? realNal))
+                            {
+                                Interlocked.Increment(ref _diagNalusDequeuedTotal);
+                                seEnviaronNalusReales = true;
+
+                                byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: realNal);
+                                await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
+                                Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+                            }
+
+                            // Si la cola estuvo vacía, enviar un paquete fallback de mantenimiento
+                            if (!seEnviaronNalusReales)
+                            {
+                                byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: fallbackNal);
+                                await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
+                                Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+                            }
+
+                            // Incrementar timestamp únicamente para frames de video (~30 FPS)
+                            videoTs += 3000;
 
                             // Enviar paquete RTP de audio (Payload Type 97 - AAC) si el puerto está configurado
                             if (_rtpAudioClient != null && _audioUdpPort > 0)
@@ -1498,6 +1616,167 @@ namespace LGCastPC
             {
                 AgregarLog($"❌ Error al iniciar transporte RTP UDP: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Inicia la captura de pantalla nativa con FFmpeg leyendo los bytes NAL H.264 Annex-B desde stdout pipe:1.
+        /// </summary>
+        private void IniciarCapturaFFmpeg(CancellationToken token)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    string ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
+                    if (!File.Exists(ffmpegPath))
+                    {
+                        ffmpegPath = "ffmpeg.exe";
+                    }
+
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = ffmpegPath,
+                        Arguments = "-f gdigrab -framerate 30 -i desktop -vf \"scale=1920:1080\" -c:v libx264 -preset ultrafast -tune zerolatency -pix_fmt yuv420p -g 30 -bf 0 -bsf:v h264_mp4toannexb -f h264 pipe:1",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    _ffmpegProcess?.Kill();
+                    _ffmpegProcess = new Process { StartInfo = psi };
+                    _ffmpegProcess.ErrorDataReceived += (s, e) => { if (!string.IsNullOrEmpty(e.Data)) Debug.WriteLine($"[FFmpeg Log]: {e.Data}"); };
+
+                    _ffmpegProcess.Start();
+                    _ffmpegProcess.BeginErrorReadLine();
+                    AgregarLog("🚀 Proceso FFmpeg iniciado. Leyendo stdout pipe:1 para inyección H.264 real...");
+
+                    Stream stdout = _ffmpegProcess.StandardOutput.BaseStream;
+                    byte[] readBuffer = new byte[65536];
+                    List<byte> pendingBuffer = new List<byte>();
+
+                    while (!token.IsCancellationRequested && !_ffmpegProcess.HasExited)
+                    {
+                        int bytesRead = stdout.Read(readBuffer, 0, readBuffer.Length);
+                        if (bytesRead <= 0) break;
+
+                        Interlocked.Add(ref _diagFfmpegBytesTotal, bytesRead);
+
+                        byte[] chunk = new byte[bytesRead];
+                        Array.Copy(readBuffer, 0, chunk, 0, bytesRead);
+                        ProcesarChunkNalAnnexB(chunk, pendingBuffer);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AgregarLog($"⚠️ Excepción en proceso FFmpeg: {ex.Message}");
+                }
+            }, token);
+        }
+
+        /// <summary>
+        /// Parsea NALUs H.264 Annex-B delimitadas por 0x00000001 o 0x000001 y las coloca en la cola _naluQueue.
+        /// Identifica tipos NAL (SPS=7, PPS=8, IDR=5, NON_IDR=1) para métricas de diagnóstico.
+        /// </summary>
+        private void ProcesarChunkNalAnnexB(byte[] chunk, List<byte> pendingBuffer)
+        {
+            pendingBuffer.AddRange(chunk);
+
+            int searchIndex = 0;
+            int lastStart = -1;
+
+            while (searchIndex < pendingBuffer.Count - 4)
+            {
+                if (pendingBuffer[searchIndex] == 0x00 &&
+                    pendingBuffer[searchIndex + 1] == 0x00 &&
+                    pendingBuffer[searchIndex + 2] == 0x00 &&
+                    pendingBuffer[searchIndex + 3] == 0x01)
+                {
+                    if (lastStart >= 0)
+                    {
+                        int nalLength = searchIndex - lastStart;
+                        byte[] nalu = new byte[nalLength];
+                        pendingBuffer.CopyTo(lastStart, nalu, 0, nalLength);
+
+                        // Clasificar tipo NAL para diagnóstico
+                        ClasificarYEncolarNalu(nalu);
+                    }
+                    lastStart = searchIndex;
+                    searchIndex += 4;
+                }
+                else if (pendingBuffer[searchIndex] == 0x00 &&
+                         pendingBuffer[searchIndex + 1] == 0x00 &&
+                         pendingBuffer[searchIndex + 2] == 0x01)
+                {
+                    if (lastStart >= 0)
+                    {
+                        int nalLength = searchIndex - lastStart;
+                        byte[] nalu = new byte[nalLength];
+                        pendingBuffer.CopyTo(lastStart, nalu, 0, nalLength);
+
+                        // Clasificar tipo NAL para diagnóstico
+                        ClasificarYEncolarNalu(nalu);
+                    }
+                    lastStart = searchIndex;
+                    searchIndex += 3;
+                }
+                else
+                {
+                    searchIndex++;
+                }
+            }
+
+            if (lastStart > 0)
+            {
+                pendingBuffer.RemoveRange(0, lastStart);
+            }
+        }
+
+        /// <summary>
+        /// Clasifica el tipo NAL H.264 (SPS=7, PPS=8, IDR=5, NON_IDR=1) y actualiza métricas diagnósticas.
+        /// Controla la profundidad máxima de cola y descarta NALUs antiguas si excede el límite de desbordamiento (1000 NALUs).
+        /// </summary>
+        private void ClasificarYEncolarNalu(byte[] nalu)
+        {
+            int headerOffset = (nalu.Length > 3 && nalu[0] == 0x00 && nalu[1] == 0x00 && nalu[2] == 0x01) ? 3 : 4;
+            if (nalu.Length > headerOffset)
+            {
+                byte nalHeader = nalu[headerOffset];
+                int nalType = nalHeader & 0x1F;
+                switch (nalType)
+                {
+                    case 7: Interlocked.Increment(ref _diagNaluSpsCount); break;
+                    case 8: Interlocked.Increment(ref _diagNaluPpsCount); break;
+                    case 5: Interlocked.Increment(ref _diagNaluIdrCount); break;
+                    case 1: Interlocked.Increment(ref _diagNaluNonIdrCount); break;
+                }
+            }
+
+            Interlocked.Increment(ref _diagNalusEnqueuedTotal);
+            Interlocked.Add(ref _diagNaluBytesTotal, nalu.Length);
+
+            // Control de desbordamiento de cola (máximo 1000 NALUs)
+            if (_naluQueue.Count > 1000)
+            {
+                if (_naluQueue.TryDequeue(out _))
+                {
+                    Interlocked.Increment(ref _diagNalusDroppedTotal);
+                }
+            }
+
+            _naluQueue.Enqueue(nalu);
+            ActualizarProfundidadMaximaCola(_naluQueue.Count);
+        }
+
+        private void ActualizarProfundidadMaximaCola(long actualDepth)
+        {
+            long currentMax;
+            do
+            {
+                currentMax = Interlocked.Read(ref _diagMaxQueueDepth);
+                if (actualDepth <= currentMax) break;
+            }
+            while (Interlocked.CompareExchange(ref _diagMaxQueueDepth, actualDepth, currentMax) != currentMax);
         }
 
         /// <summary>

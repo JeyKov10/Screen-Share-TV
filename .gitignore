@@ -430,3 +430,21 @@ FodyWeavers.xsd
 ## JetBrains Rider / IntelliJ
 .idea/
 *.DotSettings.user
+
+# Analysis and REA Artifact Exclusions
+analysis/apk/
+analysis/dex/
+analysis/elf/
+analysis/ws_capture/
+analysis/rea_raw/
+
+*.apk
+*.dex
+*.so
+*.pcap
+*.pcapng
+*_dump.txt
+*_analysis.txt
+
+.artifacts/
+scratch/
