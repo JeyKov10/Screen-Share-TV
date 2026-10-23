@@ -1,0 +1,327 @@
+=== DESENSAMBLADO DE Lcom/lge/lib/lgcast/func/c; ===
+[1615416]   Class descriptor  : 'Lcom/lge/lib/lgcast/func/c;'
+[1615417]   Access flags      : 0x0001 (PUBLIC)
+[1615418]   Superclass        : 'Ljava/lang/Object;'
+[1615419]   Interfaces        -
+[1615420]   Static fields     -
+[1615421]     #0              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615422]       name          : 'a'
+[1615423]       type          : 'I'
+[1615424]       access        : 0x001a (PRIVATE STATIC FINAL)
+[1615425]       value         : 2
+[1615426]     #1              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615427]       name          : 'b'
+[1615428]       type          : 'I'
+[1615429]       access        : 0x001a (PRIVATE STATIC FINAL)
+[1615430]       value         : 30
+[1615431]   Instance fields   -
+[1615432]     #0              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615433]       name          : 'c'
+[1615434]       type          : 'I'
+[1615435]       access        : 0x0002 (PRIVATE)
+[1615436]   Direct methods    -
+[1615437]     #0              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615438]       name          : '<init>'
+[1615439]       type          : '()V'
+[1615440]       access        : 0x10001 (PUBLIC CONSTRUCTOR)
+[1615441]       code          -
+[1615442]       registers     : 2
+[1615443]       ins           : 1
+[1615444]       outs          : 1
+[1615445]       insns size    : 8 16-bit code units
+[1615446] 4b06f0:                                        |[4b06f0] com.lge.lib.lgcast.func.c.<init>:()V
+[1615447] 4b0700: 7010 e2f7 0100                         |0000: invoke-direct {v1}, Ljava/lang/Object;.<init>:()V // method@f7e2
+[1615448] 4b0706: 1300 0a00                              |0003: const/16 v0, #int 10 // #a
+[1615449] 4b070a: 5910 5cbd                              |0005: iput v0, v1, Lcom/lge/lib/lgcast/func/c;.c:I // field@bd5c
+[1615450] 4b070e: 0e00                                   |0007: return-void
+[1615451]       catches       : (none)
+[1615452]       positions     :
+[1615453]       locals        :
+[1615454] 
+[1615455]     #1              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615456]       name          : 'a'
+[1615457]       type          : '(Ljava/security/PublicKey;[B)Ljava/lang/String;'
+[1615458]       access        : 0x0002 (PRIVATE)
+[1615459]       code          -
+[1615460]       registers     : 5
+[1615461]       ins           : 3
+[1615462]       outs          : 3
+[1615463]       insns size    : 47 16-bit code units
+[1615464] 4b047c:                                        |[4b047c] com.lge.lib.lgcast.func.c.a:(Ljava/security/PublicKey;[B)Ljava/lang/String;
+[1615465] 4b048c: 3803 2200                              |0000: if-eqz v3, 0022 // +0022
+[1615466] 4b0490: 3804 1800                              |0002: if-eqz v4, 001a // +0018
+[1615467] 4b0494: 1a00 af65                              |0004: const-string v0, "RSA/ECB/OAEPWithSHA1AndMGF1Padding" // string@65af
+[1615468] 4b0498: 7110 07fc 0000                         |0006: invoke-static {v0}, Ljavax/crypto/Cipher;.getInstance:(Ljava/lang/String;)Ljavax/crypto/Cipher; // method@fc07
+[1615469] 4b049e: 0c00                                   |0009: move-result-object v0
+[1615470] 4b04a0: 1211                                   |000a: const/4 v1, #int 1 // #1
+[1615471] 4b04a2: 6e30 08fc 1003                         |000b: invoke-virtual {v0, v1, v3}, Ljavax/crypto/Cipher;.init:(ILjava/security/Key;)V // method@fc08
+[1615472] 4b04a8: 6e20 04fc 4000                         |000e: invoke-virtual {v0, v4}, Ljavax/crypto/Cipher;.doFinal:([B)[B // method@fc04
+[1615473] 4b04ae: 0c03                                   |0011: move-result-object v3
+[1615474] 4b04b0: 1204                                   |0012: const/4 v4, #int 0 // #0
+[1615475] 4b04b2: 7120 9203 4300                         |0013: invoke-static {v3, v4}, Landroid/util/Base64;.encodeToString:([BI)Ljava/lang/String; // method@0392
+[1615476] 4b04b8: 0c03                                   |0016: move-result-object v3
+[1615477] 4b04ba: 1103                                   |0017: return-object v3
+[1615478] 4b04bc: 0d03                                   |0018: move-exception v3
+[1615479] 4b04be: 2811                                   |0019: goto 002a // +0011
+[1615480] 4b04c0: 2203 b122                              |001a: new-instance v3, Ljava/lang/Exception; // type@22b1
+[1615481] 4b04c4: 1a04 de2d                              |001c: const-string v4, "Invalid data" // string@2dde
+[1615482] 4b04c8: 7020 80f7 4300                         |001e: invoke-direct {v3, v4}, Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V // method@f780
+[1615483] 4b04ce: 2703                                   |0021: throw v3
+[1615484] 4b04d0: 2203 b122                              |0022: new-instance v3, Ljava/lang/Exception; // type@22b1
+[1615485] 4b04d4: 1a04 ef2d                              |0024: const-string v4, "Invalid key" // string@2def
+[1615486] 4b04d8: 7020 80f7 4300                         |0026: invoke-direct {v3, v4}, Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V // method@f780
+[1615487] 4b04de: 2703                                   |0029: throw v3
+[1615488] 4b04e0: 7110 8ddb 0300                         |002a: invoke-static {v3}, Lcom/lge/lib/lgcast/common/b;.a:(Ljava/lang/Throwable;)V // method@db8d
+[1615489] 4b04e6: 1203                                   |002d: const/4 v3, #int 0 // #0
+[1615490] 4b04e8: 1103                                   |002e: return-object v3
+[1615491]       catches       : 1
+[1615492]         0x0004 - 0x002a
+[1615493]           Ljava/lang/Exception; -> 0x0018
+[1615494]       positions     :
+[1615495]         0x0000 line=1
+[1615496]       locals        :
+[1615497]         0x0000 - 0x002f reg=2 this Lcom/lge/lib/lgcast/func/c;
+[1615498]         0x0000 - 0x002f reg=3 (null) Ljava/security/PublicKey;
+[1615499]         0x0000 - 0x002f reg=4 (null) [B
+[1615500] 
+[1615501]     #2              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615502]       name          : 'b'
+[1615503]       type          : '()[B'
+[1615504]       access        : 0x0002 (PRIVATE)
+[1615505]       code          -
+[1615506]       registers     : 6
+[1615507]       ins           : 1
+[1615508]       outs          : 2
+[1615509]       insns size    : 41 16-bit code units
+[1615510] 4b03dc:                                        |[4b03dc] com.lge.lib.lgcast.func.c.b:()[B
+[1615511] 4b03ec: 1300 1e00                              |0000: const/16 v0, #int 30 // #1e
+[1615512] 4b03f0: 2301 1c25                              |0002: new-array v1, v0, [B // type@251c
+[1615513] 4b03f4: 1202                                   |0004: const/4 v2, #int 0 // #0
+[1615514] 4b03f6: 2203 8c23                              |0005: new-instance v3, Ljava/util/Random; // type@238c
+[1615515] 4b03fa: 7010 2bfb 0300                         |0007: invoke-direct {v3}, Ljava/util/Random;.<init>:()V // method@fb2b
+[1615516] 4b0400: 6e20 2cfb 1300                         |000a: invoke-virtual {v3, v1}, Ljava/util/Random;.nextBytes:([B)V // method@fb2c
+[1615517] 4b0406: 280e                                   |000d: goto 001b // +000e
+[1615518] 4b0408: 0d03                                   |000e: move-exception v3
+[1615519] 4b040a: 7110 8ddb 0300                         |000f: invoke-static {v3}, Lcom/lge/lib/lgcast/common/b;.a:(Ljava/lang/Throwable;)V // method@db8d
+[1615520] 4b0410: 0123                                   |0012: move v3, v2
+[1615521] 4b0412: 3503 0800                              |0013: if-ge v3, v0, 001b // +0008
+[1615522] 4b0416: 8d34                                   |0015: int-to-byte v4, v3
+[1615523] 4b0418: 4f04 0103                              |0016: aput-byte v4, v1, v3
+[1615524] 4b041c: d803 0301                              |0018: add-int/lit8 v3, v3, #int 1 // #01
+[1615525] 4b0420: 28f9                                   |001a: goto 0013 // -0007
+[1615526] 4b0422: 3502 0d00                              |001b: if-ge v2, v0, 0028 // +000d
+[1615527] 4b0426: 4803 0102                              |001d: aget-byte v3, v1, v2
+[1615528] 4b042a: 3903 0600                              |001f: if-nez v3, 0025 // +0006
+[1615529] 4b042e: 1303 6300                              |0021: const/16 v3, #int 99 // #63
+[1615530] 4b0432: 4f03 0102                              |0023: aput-byte v3, v1, v2
+[1615531] 4b0436: d802 0201                              |0025: add-int/lit8 v2, v2, #int 1 // #01
+[1615532] 4b043a: 28f4                                   |0027: goto 001b // -000c
+[1615533] 4b043c: 1101                                   |0028: return-object v1
+[1615534]       catches       : 1
+[1615535]         0x0005 - 0x000d
+[1615536]           Ljava/lang/Exception; -> 0x000e
+[1615537]       positions     :
+[1615538]       locals        :
+[1615539] 
+[1615540]     #3              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615541]       name          : 'c'
+[1615542]       type          : '([B)Ljava/lang/String;'
+[1615543]       access        : 0x0002 (PRIVATE)
+[1615544]       code          -
+[1615545]       registers     : 3
+[1615546]       ins           : 2
+[1615547]       outs          : 2
+[1615548]       insns size    : 23 16-bit code units
+[1615549] 4b04fc:                                        |[4b04fc] com.lge.lib.lgcast.func.c.c:([B)Ljava/lang/String;
+[1615550] 4b050c: 3802 0a00                              |0000: if-eqz v2, 000a // +000a
+[1615551] 4b0510: 1200                                   |0002: const/4 v0, #int 0 // #0
+[1615552] 4b0512: 7120 9203 0200                         |0003: invoke-static {v2, v0}, Landroid/util/Base64;.encodeToString:([BI)Ljava/lang/String; // method@0392
+[1615553] 4b0518: 0c02                                   |0006: move-result-object v2
+[1615554] 4b051a: 1102                                   |0007: return-object v2
+[1615555] 4b051c: 0d02                                   |0008: move-exception v2
+[1615556] 4b051e: 2809                                   |0009: goto 0012 // +0009
+[1615557] 4b0520: 2202 b122                              |000a: new-instance v2, Ljava/lang/Exception; // type@22b1
+[1615558] 4b0524: 1a00 de2d                              |000c: const-string v0, "Invalid data" // string@2dde
+[1615559] 4b0528: 7020 80f7 0200                         |000e: invoke-direct {v2, v0}, Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V // method@f780
+[1615560] 4b052e: 2702                                   |0011: throw v2
+[1615561] 4b0530: 7110 8ddb 0200                         |0012: invoke-static {v2}, Lcom/lge/lib/lgcast/common/b;.a:(Ljava/lang/Throwable;)V // method@db8d
+[1615562] 4b0536: 1202                                   |0015: const/4 v2, #int 0 // #0
+[1615563] 4b0538: 1102                                   |0016: return-object v2
+[1615564]       catches       : 1
+[1615565]         0x0003 - 0x0012
+[1615566]           Ljava/lang/Exception; -> 0x0008
+[1615567]       positions     :
+[1615568]       locals        :
+[1615569] 
+[1615570]     #4              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615571]       name          : 'd'
+[1615572]       type          : '(Ljava/lang/String;)Ljava/security/PublicKey;'
+[1615573]       access        : 0x0002 (PRIVATE)
+[1615574]       code          -
+[1615575]       registers     : 4
+[1615576]       ins           : 2
+[1615577]       outs          : 2
+[1615578]       insns size    : 48 16-bit code units
+[1615579] 4b054c:                                        |[4b054c] com.lge.lib.lgcast.func.c.d:(Ljava/lang/String;)Ljava/security/PublicKey;
+[1615580] 4b055c: 1200                                   |0000: const/4 v0, #int 0 // #0
+[1615581] 4b055e: 3803 0a00                              |0001: if-eqz v3, 000b // +000a
+[1615582] 4b0562: 1201                                   |0003: const/4 v1, #int 0 // #0
+[1615583] 4b0564: 7120 9103 1300                         |0004: invoke-static {v3, v1}, Landroid/util/Base64;.decode:(Ljava/lang/String;I)[B // method@0391
+[1615584] 4b056a: 0c03                                   |0007: move-result-object v3
+[1615585] 4b056c: 2804                                   |0008: goto 000c // +0004
+[1615586] 4b056e: 0d03                                   |0009: move-exception v3
+[1615587] 4b0570: 2822                                   |000a: goto 002c // +0022
+[1615588] 4b0572: 0703                                   |000b: move-object v3, v0
+[1615589] 4b0574: 3803 0800                              |000c: if-eqz v3, 0014 // +0008
+[1615590] 4b0578: 2201 5123                              |000e: new-instance v1, Ljava/security/spec/X509EncodedKeySpec; // type@2351
+[1615591] 4b057c: 7020 e1f9 3100                         |0010: invoke-direct {v1, v3}, Ljava/security/spec/X509EncodedKeySpec;.<init>:([B)V // method@f9e1
+[1615592] 4b0582: 2802                                   |0013: goto 0015 // +0002
+[1615593] 4b0584: 0701                                   |0014: move-object v1, v0
+[1615594] 4b0586: 3801 0d00                              |0015: if-eqz v1, 0022 // +000d
+[1615595] 4b058a: 1a03 ad65                              |0017: const-string v3, "RSA" // string@65ad
+[1615596] 4b058e: 7110 baf9 0300                         |0019: invoke-static {v3}, Ljava/security/KeyFactory;.getInstance:(Ljava/lang/String;)Ljava/security/KeyFactory; // method@f9ba
+[1615597] 4b0594: 0c03                                   |001c: move-result-object v3
+[1615598] 4b0596: 6e20 b9f9 1300                         |001d: invoke-virtual {v3, v1}, Ljava/security/KeyFactory;.generatePublic:(Ljava/security/spec/KeySpec;)Ljava/security/PublicKey; // method@f9b9
+[1615599] 4b059c: 0c03                                   |0020: move-result-object v3
+[1615600] 4b059e: 2802                                   |0021: goto 0023 // +0002
+[1615601] 4b05a0: 0703                                   |0022: move-object v3, v0
+[1615602] 4b05a2: 3803 0300                              |0023: if-eqz v3, 0026 // +0003
+[1615603] 4b05a6: 1103                                   |0025: return-object v3
+[1615604] 4b05a8: 2203 b122                              |0026: new-instance v3, Ljava/lang/Exception; // type@22b1
+[1615605] 4b05ac: 7010 7ff7 0300                         |0028: invoke-direct {v3}, Ljava/lang/Exception;.<init>:()V // method@f77f
+[1615606] 4b05b2: 2703                                   |002b: throw v3
+[1615607] 4b05b4: 7110 8ddb 0300                         |002c: invoke-static {v3}, Lcom/lge/lib/lgcast/common/b;.a:(Ljava/lang/Throwable;)V // method@db8d
+[1615608] 4b05ba: 1100                                   |002f: return-object v0
+[1615609]       catches       : 1
+[1615610]         0x0004 - 0x002c
+[1615611]           Ljava/lang/Exception; -> 0x0009
+[1615612]       positions     :
+[1615613]       locals        :
+[1615614] 
+[1615615]     #5              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615616]       name          : 'e'
+[1615617]       type          : '()[B'
+[1615618]       access        : 0x0002 (PRIVATE)
+[1615619]       code          -
+[1615620]       registers     : 4
+[1615621]       ins           : 1
+[1615622]       outs          : 0
+[1615623]       insns size    : 14 16-bit code units
+[1615624] 4b0450:                                        |[4b0450] com.lge.lib.lgcast.func.c.e:()[B
+[1615625] 4b0460: 5230 5cbd                              |0000: iget v0, v3, Lcom/lge/lib/lgcast/func/c;.c:I // field@bd5c
+[1615626] 4b0464: 1211                                   |0002: const/4 v1, #int 1 // #1
+[1615627] 4b0466: d802 0001                              |0003: add-int/lit8 v2, v0, #int 1 // #01
+[1615628] 4b046a: 5932 5cbd                              |0005: iput v2, v3, Lcom/lge/lib/lgcast/func/c;.c:I // field@bd5c
+[1615629] 4b046e: 8d00                                   |0007: int-to-byte v0, v0
+[1615630] 4b0470: 2311 1c25                              |0008: new-array v1, v1, [B // type@251c
+[1615631] 4b0474: 1202                                   |000a: const/4 v2, #int 0 // #0
+[1615632] 4b0476: 4f00 0102                              |000b: aput-byte v0, v1, v2
+[1615633] 4b047a: 1101                                   |000d: return-object v1
+[1615634]       catches       : (none)
+[1615635]       positions     :
+[1615636]       locals        :
+[1615637] 
+[1615638]   Virtual methods   -
+[1615639]     #0              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615640]       name          : 'a'
+[1615641]       type          : '(Ljava/lang/String;)Ljava/util/ArrayList;'
+[1615642]       access        : 0x0001 (PUBLIC)
+[1615643]       code          -
+[1615644]       registers     : 6
+[1615645]       ins           : 2
+[1615646]       outs          : 3
+[1615647]       insns size    : 81 16-bit code units
+[1615648] 4b062c:                                        |[4b062c] com.lge.lib.lgcast.func.c.a:(Ljava/lang/String;)Ljava/util/ArrayList;
+[1615649] 4b063c: 3805 0900                              |0000: if-eqz v5, 0009 // +0009
+[1615650] 4b0640: 7020 b0db 5400                         |0002: invoke-direct {v4, v5}, Lcom/lge/lib/lgcast/func/c;.d:(Ljava/lang/String;)Ljava/security/PublicKey; // method@dbb0
+[1615651] 4b0646: 0c05                                   |0005: move-result-object v5
+[1615652] 4b0648: 2804                                   |0006: goto 000a // +0004
+[1615653] 4b064a: 0d05                                   |0007: move-exception v5
+[1615654] 4b064c: 2840                                   |0008: goto 0048 // +0040
+[1615655] 4b064e: 1205                                   |0009: const/4 v5, #int 0 // #0
+[1615656] 4b0650: 3805 3600                              |000a: if-eqz v5, 0040 // +0036
+[1615657] 4b0654: 2200 6723                              |000c: new-instance v0, Ljava/util/ArrayList; // type@2367
+[1615658] 4b0658: 7010 30fa 0000                         |000e: invoke-direct {v0}, Ljava/util/ArrayList;.<init>:()V // method@fa30
+[1615659] 4b065e: 6e10 37fa 0000                         |0011: invoke-virtual {v0}, Ljava/util/ArrayList;.clear:()V // method@fa37
+[1615660] 4b0664: 1201                                   |0014: const/4 v1, #int 0 // #0
+[1615661] 4b0666: 1222                                   |0015: const/4 v2, #int 2 // #2
+[1615662] 4b0668: 3521 2900                              |0016: if-ge v1, v2, 003f // +0029
+[1615663] 4b066c: 2202 491c                              |0018: new-instance v2, Lcom/lge/lib/lgcast/iface/MasterKey; // type@1c49
+[1615664] 4b0670: 7010 cfdb 0200                         |001a: invoke-direct {v2}, Lcom/lge/lib/lgcast/iface/MasterKey;.<init>:()V // method@dbcf
+[1615665] 4b0676: 7010 b1db 0400                         |001d: invoke-direct {v4}, Lcom/lge/lib/lgcast/func/c;.e:()[B // method@dbb1
+[1615666] 4b067c: 0c03                                   |0020: move-result-object v3
+[1615667] 4b067e: 5b23 83bd                              |0021: iput-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.mki:[B // field@bd83
+[1615668] 4b0682: 7010 aedb 0400                         |0023: invoke-direct {v4}, Lcom/lge/lib/lgcast/func/c;.b:()[B // method@dbae
+[1615669] 4b0688: 0c03                                   |0026: move-result-object v3
+[1615670] 4b068a: 5b23 81bd                              |0027: iput-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.key:[B // field@bd81
+[1615671] 4b068e: 5423 83bd                              |0029: iget-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.mki:[B // field@bd83
+[1615672] 4b0692: 7020 afdb 3400                         |002b: invoke-direct {v4, v3}, Lcom/lge/lib/lgcast/func/c;.c:([B)Ljava/lang/String; // method@dbaf
+[1615673] 4b0698: 0c03                                   |002e: move-result-object v3
+[1615674] 4b069a: 5b23 84bd                              |002f: iput-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.mkiSecureText:Ljava/lang/String; // field@bd84
+[1615675] 4b069e: 5423 81bd                              |0031: iget-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.key:[B // field@bd81
+[1615676] 4b06a2: 7030 abdb 5403                         |0033: invoke-direct {v4, v5, v3}, Lcom/lge/lib/lgcast/func/c;.a:(Ljava/security/PublicKey;[B)Ljava/lang/String; // method@dbab
+[1615677] 4b06a8: 0c03                                   |0036: move-result-object v3
+[1615678] 4b06aa: 5b23 82bd                              |0037: iput-object v3, v2, Lcom/lge/lib/lgcast/iface/MasterKey;.keySecureText:Ljava/lang/String; // field@bd82
+[1615679] 4b06ae: 6e20 34fa 2000                         |0039: invoke-virtual {v0, v2}, Ljava/util/ArrayList;.add:(Ljava/lang/Object;)Z // method@fa34
+[1615680] 4b06b4: d801 0101                              |003c: add-int/lit8 v1, v1, #int 1 // #01
+[1615681] 4b06b8: 28d7                                   |003e: goto 0015 // -0029
+[1615682] 4b06ba: 1100                                   |003f: return-object v0
+[1615683] 4b06bc: 2205 b122                              |0040: new-instance v5, Ljava/lang/Exception; // type@22b1
+[1615684] 4b06c0: 1a00 fe2d                              |0042: const-string v0, "Invalid public Key" // string@2dfe
+[1615685] 4b06c4: 7020 80f7 0500                         |0044: invoke-direct {v5, v0}, Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V // method@f780
+[1615686] 4b06ca: 2705                                   |0047: throw v5
+[1615687] 4b06cc: 7110 8ddb 0500                         |0048: invoke-static {v5}, Lcom/lge/lib/lgcast/common/b;.a:(Ljava/lang/Throwable;)V // method@db8d
+[1615688] 4b06d2: 2205 6723                              |004b: new-instance v5, Ljava/util/ArrayList; // type@2367
+[1615689] 4b06d6: 7010 30fa 0500                         |004d: invoke-direct {v5}, Ljava/util/ArrayList;.<init>:()V // method@fa30
+[1615690] 4b06dc: 1105                                   |0050: return-object v5
+[1615691]       catches       : 1
+[1615692]         0x0002 - 0x0048
+[1615693]           Ljava/lang/Exception; -> 0x0007
+[1615694]       positions     :
+[1615695]         0x0000 line=2
+[1615696]       locals        :
+[1615697]         0x0000 - 0x0051 reg=4 this Lcom/lge/lib/lgcast/func/c;
+[1615698]         0x0000 - 0x0051 reg=5 (null) Ljava/lang/String;
+[1615699] 
+[1615700]     #1              : (in Lcom/lge/lib/lgcast/func/c;)
+[1615701]       name          : 'a'
+[1615702]       type          : '([B)Ljava/util/ArrayList;'
+[1615703]       access        : 0x0001 (PUBLIC)
+[1615704]       code          -
+[1615705]       registers     : 9
+[1615706]       ins           : 2
+[1615707]       outs          : 2
+[1615708]       insns size    : 40 16-bit code units
+[1615709] 4b05cc:                                        |[4b05cc] com.lge.lib.lgcast.func.c.a:([B)Ljava/util/ArrayList;
+[1615710] 4b05dc: 1210                                   |0000: const/4 v0, #int 1 // #1
+[1615711] 4b05de: 2201 6723                              |0001: new-instance v1, Ljava/util/ArrayList; // type@2367
+[1615712] 4b05e2: 7010 30fa 0100                         |0003: invoke-direct {v1}, Ljava/util/ArrayList;.<init>:()V // method@fa30
+[1615713] 4b05e8: 6e10 37fa 0100                         |0006: invoke-virtual {v1}, Ljava/util/ArrayList;.clear:()V // method@fa37
+[1615714] 4b05ee: 1202                                   |0009: const/4 v2, #int 0 // #0
+[1615715] 4b05f0: 0123                                   |000a: move v3, v2
+[1615716] 4b05f2: 1224                                   |000b: const/4 v4, #int 2 // #2
+[1615717] 4b05f4: 3543 1b00                              |000c: if-ge v3, v4, 0027 // +001b
+[1615718] 4b05f8: 2204 491c                              |000e: new-instance v4, Lcom/lge/lib/lgcast/iface/MasterKey; // type@1c49
+[1615719] 4b05fc: 7010 cfdb 0400                         |0010: invoke-direct {v4}, Lcom/lge/lib/lgcast/iface/MasterKey;.<init>:()V // method@dbcf
+[1615720] 4b0602: b003                                   |0013: add-int/2addr v3, v0
+[1615721] 4b0604: 8d35                                   |0014: int-to-byte v5, v3
+[1615722] 4b0606: 2306 1c25                              |0015: new-array v6, v0, [B // type@251c
+[1615723] 4b060a: 4f05 0602                              |0017: aput-byte v5, v6, v2
+[1615724] 4b060e: 5b46 83bd                              |0019: iput-object v6, v4, Lcom/lge/lib/lgcast/iface/MasterKey;.mki:[B // field@bd83
+[1615725] 4b0612: 5b48 81bd                              |001b: iput-object v8, v4, Lcom/lge/lib/lgcast/iface/MasterKey;.key:[B // field@bd81
+[1615726] 4b0616: 1a05 09f3                              |001d: const-string v5, "unused" // string@f309
+[1615727] 4b061a: 5b45 84bd                              |001f: iput-object v5, v4, Lcom/lge/lib/lgcast/iface/MasterKey;.mkiSecureText:Ljava/lang/String; // field@bd84
+[1615728] 4b061e: 5b45 82bd                              |0021: iput-object v5, v4, Lcom/lge/lib/lgcast/iface/MasterKey;.keySecureText:Ljava/lang/String; // field@bd82
+[1615729] 4b0622: 6e20 34fa 4100                         |0023: invoke-virtual {v1, v4}, Ljava/util/ArrayList;.add:(Ljava/lang/Object;)Z // method@fa34
+[1615730] 4b0628: 28e5                                   |0026: goto 000b // -001b
+[1615731] 4b062a: 1101                                   |0027: return-object v1
+[1615732]       catches       : (none)
+[1615733]       positions     :
+[1615734]         0x0000 line=3
+[1615735]       locals        :
+[1615736]         0x0000 - 0x0028 reg=7 this Lcom/lge/lib/lgcast/func/c;
+[1615737]         0x0000 - 0x0028 reg=8 (null) [B
+[1615738] 
+[1615739]   source_file_idx   : -1 (unknown)
+[1615740] 
+[1615741] Class #5993            -

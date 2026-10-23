@@ -1,0 +1,164 @@
+=== EVIDENCIA EXACTA DE SRTP EN DEX Y .SO ===
+
+--- BÃšSQUEDA DEX PARA: SRTP ---
+  [LÃ­nea 1171485]:       type          : 'Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType;'
+  [LÃ­nea 1171489]:       type          : 'Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPCipherType;'
+  [LÃ­nea 1171518]: 426664: 6200 626a                              |0008: sget-object v0, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType;.HMAC_SHA1_80:Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType; // field@6a62
+  [LÃ­nea 1171519]: 426668: 5b10 3a6a                              |000a: iput-object v0, v1, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$SecurityConfig;.authType:Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType; // field@6a3a
+  [LÃ­nea 1171520]: 42666c: 6200 676a                              |000c: sget-object v0, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPCipherType;.AES_128_ICM:Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPCipherType; // field@6a67
+  [LÃ­nea 1171521]: 426670: 5b10 3b6a                              |000e: iput-object v0, v1, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$SecurityConfig;.cipherType:Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPCipherType; // field@6a3b
+  [LÃ­nea 1171530]:       type          : '()Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType;'
+  [LÃ­nea 1171537]: 4265fc:                                        |[4265fc] com.connectsdk.service.webos.lgcast.common.transfer.RTPStreamerConfig$SecurityConfig.getAuthType:()Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType;
+  [LÃ­nea 1171538]: 42660c: 5410 3a6a                              |0000: iget-object v0, v1, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$SecurityConfig;.authType:Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPAuthType; // field@6a3a
+  [LÃ­nea 1171546]:       type          : '()Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerData$SRTPCipherType;'
+  Total coincidencias en DEX: 141
+
+--- BÃšSQUEDA DEX PARA: srtpenc ---
+  Total coincidencias en DEX: 0
+
+--- BÃšSQUEDA DEX PARA: srtpdec ---
+  Total coincidencias en DEX: 0
+
+--- BÃšSQUEDA DEX PARA: AES ---
+  [LÃ­nea 101588]: 1f7120: 7120 f80f 6400                         |001e: invoke-static {v4, v6}, Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;.encryptString:(Ljava/lang/String;Landroid/content/Context;)Ljava/lang/String; // method@0ff8
+  [LÃ­nea 102543]: 1f78ea: 7120 f80f 6400                         |0029: invoke-static {v4, v6}, Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;.encryptString:(Ljava/lang/String;Landroid/content/Context;)Ljava/lang/String; // method@0ff8
+  [LÃ­nea 103181]: 1f7d68: 7120 f80f 6200                         |003c: invoke-static {v2, v6}, Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;.encryptString:(Ljava/lang/String;Landroid/content/Context;)Ljava/lang/String; // method@0ff8
+  [LÃ­nea 104740]: 1fa678: 1a01 e016                              |000a: const-string v1, "AES_00" // string@16e0
+  [LÃ­nea 104950]:   Class descriptor  : 'Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;'
+  [LÃ­nea 104955]:     #0              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;)
+  [LÃ­nea 104960]:     #1              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;)
+  [LÃ­nea 104965]:     #2              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;)
+  [LÃ­nea 104969]:       value         : "AES_00"
+  [LÃ­nea 104970]:     #3              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptionHelper;)
+  Total coincidencias en DEX: 262
+
+--- BÃšSQUEDA DEX PARA: masterKey ---
+  [LÃ­nea 1170293]:       name          : 'updateMasterKey'
+  [LÃ­nea 1170301]: 4261f0:                                        |[4261f0] com.connectsdk.service.webos.lgcast.common.streaming.RTPStreaming.updateMasterKey:()V
+  [LÃ­nea 1170304]: 426208: 6e10 5988 0000                         |0004: invoke-virtual {v0}, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamer;.updateMasterKey:()V // method@8859
+  [LÃ­nea 1170714]:       name          : 'nativeUpdateMasterKey'
+  [LÃ­nea 1171168]:       name          : 'updateMasterKey'
+  [LÃ­nea 1171176]: 427c28:                                        |[427c28] com.connectsdk.service.webos.lgcast.common.transfer.RTPStreamer.updateMasterKey:()V
+  [LÃ­nea 1171179]: 427c3e: 1b01 7608 0100                         |0003: const-string/jumbo v1, "updateMasterKey.." // string@00010876
+  [LÃ­nea 1171181]: 427c4a: 7010 4c88 0200                         |0009: invoke-direct {v2}, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamer;.nativeUpdateMasterKey:()V // method@884c
+  [LÃ­nea 1171666]:       name          : 'masterKey'
+  [LÃ­nea 1173419]:       name          : 'masterKey'
+  Total coincidencias en DEX: 51
+
+--- BÃšSQUEDA DEX PARA: mki ---
+  [LÃ­nea 1171492]:       name          : 'enableMki'
+  [LÃ­nea 1171517]: 426660: 5c10 3c6a                              |0006: iput-boolean v0, v1, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$SecurityConfig;.enableMki:Z // field@6a3c
+  [LÃ­nea 1171670]:       name          : 'mki'
+  [LÃ­nea 1173427]:       name          : 'mki'
+  [LÃ­nea 1173431]:       name          : 'mkiByteLen'
+  [LÃ­nea 1173470]:       name          : 'enableMki'
+  [LÃ­nea 1173503]: 4272dc: 5c10 7e6a                              |0006: iput-boolean v0, v1, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerSetting$SecurityInfo;.enableMki:Z // field@6a7e
+  [LÃ­nea 1173532]: 42729c: 5546 7e6a                              |0018: iget-boolean v6, v4, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerSetting$SecurityInfo;.enableMki:Z // field@6a7e
+  [LÃ­nea 1173534]: 4272a4: 7030 b588 5400                         |001c: invoke-direct {v4, v5, v0}, Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerSetting$SecurityInfo;.addMkiInfo:(Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$SecurityKey;Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerSetting$KeyInfo;)V // method@88b5
+  [LÃ­nea 1173546]:       name          : 'addMkiInfo'
+  Total coincidencias en DEX: 29
+
+--- BÃšSQUEDA DEX PARA: crypto ---
+  [LÃ­nea 105030]: 1f8cae: 7110 0810 0500                         |0007: invoke-static {v5}, Lcom/amazon/identity/auth/device/datastore/AESEncryptor;.getInstance:(Landroid/content/Context;)Lcom/amazon/identity/auth/device/datastore/AESEncryptor; // method@1008
+  [LÃ­nea 105032]: 1f8cb6: 6e20 0410 4500                         |000b: invoke-virtual {v5, v4}, Lcom/amazon/identity/auth/device/datastore/AESEncryptor;.encryptData:(Ljava/lang/String;)Ljava/lang/String; // method@1004
+  [LÃ­nea 105083]: 1f8c58: 7110 0810 0000                         |000e: invoke-static {v0}, Lcom/amazon/identity/auth/device/datastore/AESEncryptor;.getInstance:(Landroid/content/Context;)Lcom/amazon/identity/auth/device/datastore/AESEncryptor; // method@1008
+  [LÃ­nea 105085]: 1f8c60: 6e20 0210 3000                         |0012: invoke-virtual {v0, v3}, Lcom/amazon/identity/auth/device/datastore/AESEncryptor;.decryptData:(Ljava/lang/String;)Ljava/lang/String; // method@1002
+  [LÃ­nea 105214]:   Class descriptor  : 'Lcom/amazon/identity/auth/device/datastore/AESEncryptor;'
+  [LÃ­nea 105219]:     #0              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptor;)
+  [LÃ­nea 105224]:     #1              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptor;)
+  [LÃ­nea 105226]:       type          : 'Lcom/amazon/identity/auth/device/datastore/AESEncryptor;'
+  [LÃ­nea 105229]:     #2              : (in Lcom/amazon/identity/auth/device/datastore/AESEncryptor;)
+  [LÃ­nea 105233]:       value         : "AESEncryptor"
+  Total coincidencias en DEX: 225
+
+--- BÃšSQUEDA DEX PARA: MasterKeyFactoryIF ---
+  [LÃ­nea 1181325]: 42b7a2: 2201 b220                              |0005: new-instance v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; // type@20b2
+  [LÃ­nea 1181326]: 42b7a6: 7010 8bdb 0100                         |0007: invoke-direct {v1}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.<init>:()V // method@db8b
+  [LÃ­nea 1181327]: 42b7ac: 6e20 8ddb 7100                         |000a: invoke-virtual {v1, v7}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.createKeys:(Ljava/lang/String;)Ljava/util/ArrayList; // method@db8d
+  [LÃ­nea 1190529]: 4305ec: 2200 b220                              |0054: new-instance v0, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; // type@20b2
+  [LÃ­nea 1190530]: 4305f0: 7010 8bdb 0000                         |0056: invoke-direct {v0}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.<init>:()V // method@db8b
+  [LÃ­nea 1190532]: 4305fa: 6e20 8ddb 6000                         |005b: invoke-virtual {v0, v6}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.createKeys:(Ljava/lang/String;)Ljava/util/ArrayList; // method@db8d
+  [LÃ­nea 1190652]: 43064e: 2201 b220                              |0011: new-instance v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; // type@20b2
+  [LÃ­nea 1190653]: 430652: 7010 8bdb 0100                         |0013: invoke-direct {v1}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.<init>:()V // method@db8b
+  [LÃ­nea 1190655]: 43065c: 6e20 8cdb 2100                         |0018: invoke-virtual {v1, v2}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.createFixedKeys:([B)Ljava/util/ArrayList; // method@db8c
+  Total coincidencias en DEX: 9
+
+--- BÃšSQUEDA DEX PARA: createKeys ---
+  [LÃ­nea 169494]:       name          : 'createKeystore'
+  [LÃ­nea 169502]: 21a428:                                        |[21a428] com.amazonaws.mobileconnectors.iot.AWSIotKeystoreHelper.createKeystore:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  [LÃ­nea 170157]: 21a708: 7130 8b18 a90b                         |0048: invoke-static {v9, v10, v11}, Lcom/amazonaws/mobileconnectors/iot/AWSIotKeystoreHelper;.createKeystore:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V // method@188b
+  [LÃ­nea 222874]:       name          : 'createKeysAndCertificate'
+  [LÃ­nea 222875]:       type          : '(Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateRequest;)Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateResult;'
+  [LÃ­nea 226517]:       name          : 'createKeysAndCertificate'
+  [LÃ­nea 226518]:       type          : '(Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateRequest;)Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateResult;'
+  [LÃ­nea 226525]: 239dec:                                        |[239dec] com.amazonaws.services.iot.AWSIotClient.createKeysAndCertificate:(Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateRequest;)Lcom/amazonaws/services/iot/model/CreateKeysAndCertificateResult;
+  [LÃ­nea 226536]: 239e24: 2206 7209                              |0014: new-instance v6, Lcom/amazonaws/services/iot/model/transform/CreateKeysAndCertificateRequestMarshaller; // type@0972
+  [LÃ­nea 226537]: 239e28: 7010 9449 0600                         |0016: invoke-direct {v6}, Lcom/amazonaws/services/iot/model/transform/CreateKeysAndCertificateRequestMarshaller;.<init>:()V // method@4994
+  Total coincidencias en DEX: 184
+
+--- BÃšSQUEDA DE CADENAS EN libgstreamer-appcast.so ---
+  [ENCONTRADO EN .SO]: Cadena que coincide con 'SRTP'
+  [ENCONTRADO EN .SO]: Cadena que coincide con 'srtpenc'
+  [ENCONTRADO EN .SO]: Cadena que coincide con 'masterKey'
+  [ENCONTRADO EN .SO]: Cadena que coincide con 'mki'
+  [SÃMBOLO/CADENA SO]: cast_media_set_security_key_array
+  [SÃMBOLO/CADENA SO]: pthread_key_create
+  [SÃMBOLO/CADENA SO]: updateRTPMasterKey
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_video_app_mjpeg
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_video_app_h264
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_audio_app_pcm
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_audio_app_mp4a
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_audio_app_pcm_opus
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_app_audio_pcm_video_h264
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_app_audio_pcm_video_mjpeg
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_app_audio_aac_video_mjpeg
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_app_audio_pcm_opus_video_h264
+  [SÃMBOLO/CADENA SO]: srtp_pipeline_app_audio_aac_video_h264
+  [SÃMBOLO/CADENA SO]: srtp_soft_limit_cb
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: SRTP
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: nativeUpdateMasterKey
+  [SÃMBOLO/CADENA SO]: keyCount
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: masterKeyLen
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: keyInfos
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: enableMki
+  [SÃMBOLO/CADENA SO]: mkiByteLen
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: updateRTPMasterKey
+  [SÃMBOLO/CADENA SO]: masterKey
+  [SÃMBOLO/CADENA SO]: cast_media_set_security_key_array
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpV
+  [SÃMBOLO/CADENA SO]: srtpenc
+  [SÃMBOLO/CADENA SO]: srtpA
+  [SÃMBOLO/CADENA SO]: srtp_soft_limit_cb
+  [SÃMBOLO/CADENA SO]: SRTP
+  [SÃMBOLO/CADENA SO]: keys

@@ -1,0 +1,69 @@
+=== RECONSTRUCCION DETALLADA DE MasterKey Y MasterKeyFactoryIF ===
+
+=== CLASE: Lcom/lge/lib/lgcast/iface/MasterKey; ===
+=== CLASE: Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; ===
+=== CLASE: Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP; ===
+=== BUSQUEDA DE FIXED_KEY EN DEX ===
+[1186374]   Access flags      : 0x0001 (PUBLIC)
+[1186375]   Superclass        : 'Ljava/lang/Object;'
+[1186376]   Interfaces        -
+[1186377]   Static fields     -
+[1186378]     #0              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;)
+[1186379]       name          : 'FIXED_KEY'
+[1186380]       type          : '[B'
+[1186381]       access        : 0x0019 (PUBLIC STATIC FINAL)
+[1186382]       value         : null
+[1186383]     #1              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;)
+[1186384]       name          : 'SSRC'
+[1186385]       type          : 'J'
+[1186386]       access        : 0x0019 (PUBLIC STATIC FINAL)
+[1186387]       value         : 1356955624
+[1186388]   Instance fields   -
+[1186389]   Direct methods    -
+[1186390]     #0              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;)
+[1186391]       name          : '<clinit>'
+[1186392]       type          : '()V'
+[1186393]       access        : 0x10008 (STATIC CONSTRUCTOR)
+[1186394]       code          -
+[1186398]       insns size    : 29 16-bit code units
+[1186399] 42e794:                                        |[42e794] com.connectsdk.service.webos.lgcast.screenmirroring.ScreenMirroringConfig$RTP.<clinit>:()V
+[1186400] 42e7a4: 1300 1e00                              |0000: const/16 v0, #int 30 // #1e
+[1186401] 42e7a8: 2300 2229                              |0002: new-array v0, v0, [B // type@2922
+[1186402] 42e7ac: 2600 0600 0000                         |0004: fill-array-data v0, 0000000a // +00000006
+[1186403] 42e7b2: 6900 3f6b                              |0007: sput-object v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;.FIXED_KEY:[B // field@6b3f
+[1186404] 42e7b6: 0e00                                   |0009: return-void
+[1186405] 42e7b8: 0003 0100 1e00 0000 0123 4567 8901 ... |000a: array-data (19 units)
+[1186406]       catches       : (none)
+[1186407]       positions     :
+[1186408]       locals        :
+[1186409] 
+[1186410]     #1              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;)
+[1186411]       name          : '<init>'
+[1186412]       type          : '()V'
+[1186413]       access        : 0x10001 (PUBLIC CONSTRUCTOR)
+[1186414]       code          -
+[1186415]       registers     : 1
+[1186416]       ins           : 1
+[1186417]       outs          : 1
+[1186418]       insns size    : 4 16-bit code units
+[1190649] 430642: 5901 856b                              |000b: iput v1, v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;.videoWidth:I // field@6b85
+[1190650] 430646: 1301 3804                              |000d: const/16 v1, #int 1080 // #438
+[1190651] 43064a: 5901 836b                              |000f: iput v1, v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;.videoHeight:I // field@6b83
+[1190652] 43064e: 2201 b220                              |0011: new-instance v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; // type@20b2
+[1190653] 430652: 7010 8bdb 0100                         |0013: invoke-direct {v1}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.<init>:()V // method@db8b
+[1190654] 430658: 6202 3f6b                              |0016: sget-object v2, Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;.FIXED_KEY:[B // field@6b3f
+[1190655] 43065c: 6e20 8cdb 2100                         |0018: invoke-virtual {v1, v2}, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.createFixedKeys:([B)Ljava/util/ArrayList; // method@db8c
+[1190656] 430662: 0c01                                   |001b: move-result-object v1
+[1190657] 430664: 5b01 7a6b                              |001c: iput-object v1, v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/capability/MirroringSourceCapability;.masterKeys:Ljava/util/ArrayList; // field@6b7a
+[1190658] 430668: 1100                                   |001e: return-object v0
+[1190659]       catches       : (none)
+[1190660]       positions     :
+[1190661]       locals        :
+[1190662] 
+[1190663]     #8              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/service/MirroringServiceFunc;)
+[1190664]       name          : 'createRtpAudioConfig'
+[1190665]       type          : '()Lcom/connectsdk/service/webos/lgcast/common/transfer/RTPStreamerConfig$AudioConfig;'
+[1190666]       access        : 0x0009 (PUBLIC STATIC)
+[1190667]       code          -
+[1190668]       registers     : 3
+[1190669]       ins           : 0

@@ -1,0 +1,30 @@
+=== AUDITORIA DE DISTRIBUCION DE MARKER BIT M POR ACCESS UNIT ===
+Total Access Units analizadas: 22
+
+Frame #1 -> NALUs: 12 | Markers M=1 emitidos: 12
+Frame #2 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #3 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #4 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #5 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #6 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #7 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #8 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #9 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #10 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #11 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #12 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #13 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #14 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #15 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #16 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #17 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #18 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #19 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #20 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #21 -> NALUs: 9 | Markers M=1 emitidos: 9
+Frame #22 -> NALUs: 9 | Markers M=1 emitidos: 9
+
+=== RESUMEN GLOBAL ===
+Frames detectados: 22
+Markers M=1 emitidos: 201
+Promedio Markers por Frame: 9.13636363636364

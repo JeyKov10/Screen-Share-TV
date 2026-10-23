@@ -1,0 +1,145 @@
+=== DESENSAMBLADO COMPLETO FLUJO SRTP LGCAST ===
+
+=== ARCHIVO: C:\Users\riosv\Desktop\Screen Share TV\Screen-Share-TV\analysis\rea_raw\dex_dump20.txt | CLASE: Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF; ===
+[1617016]   Class descriptor  : 'Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;'
+[1617017]   Access flags      : 0x0001 (PUBLIC)
+[1617018]   Superclass        : 'Ljava/lang/Object;'
+[1617019]   Interfaces        -
+[1617020]   Static fields     -
+[1617021]   Instance fields   -
+[1617022]     #0              : (in Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;)
+[1617023]       name          : 'a'
+[1617024]       type          : 'Lcom/lge/lib/lgcast/func/c;'
+[1617025]       access        : 0x0002 (PRIVATE)
+[1617026]   Direct methods    -
+[1617027]     #0              : (in Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;)
+[1617028]       name          : '<init>'
+[1617029]       type          : '()V'
+[1617030]       access        : 0x10001 (PUBLIC CONSTRUCTOR)
+[1617031]       code          -
+[1617032]       registers     : 2
+[1617033]       ins           : 1
+[1617034]       outs          : 1
+[1617035]       insns size    : 11 16-bit code units
+[1617036] 4b123c:                                        |[4b123c] com.lge.lib.lgcast.iface.MasterKeyFactoryIF.<init>:()V
+[1617037] 4b124c: 7010 e2f7 0100                         |0000: invoke-direct {v1}, Ljava/lang/Object;.<init>:()V // method@f7e2
+[1617038] 4b1252: 2200 401c                              |0003: new-instance v0, Lcom/lge/lib/lgcast/func/c; // type@1c40
+[1617039] 4b1256: 7010 aadb 0000                         |0005: invoke-direct {v0}, Lcom/lge/lib/lgcast/func/c;.<init>:()V // method@dbaa
+[1617040] 4b125c: 5b10 85bd                              |0008: iput-object v0, v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.a:Lcom/lge/lib/lgcast/func/c; // field@bd85
+[1617041] 4b1260: 0e00                                   |000a: return-void
+[1617042]       catches       : (none)
+[1617043]       positions     :
+[1617044]       locals        :
+[1617045] 
+[1617046]   Virtual methods   -
+[1617047]     #0              : (in Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;)
+[1617048]       name          : 'createFixedKeys'
+[1617049]       type          : '([B)Ljava/util/ArrayList;'
+[1617050]       access        : 0x0001 (PUBLIC)
+[1617051]       code          -
+[1617052]       registers     : 3
+[1617053]       ins           : 2
+[1617054]       outs          : 2
+[1617055]       insns size    : 7 16-bit code units
+[1617056] 4b11fc:                                        |[4b11fc] com.lge.lib.lgcast.iface.MasterKeyFactoryIF.createFixedKeys:([B)Ljava/util/ArrayList;
+[1617057] 4b120c: 5410 85bd                              |0000: iget-object v0, v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.a:Lcom/lge/lib/lgcast/func/c; // field@bd85
+[1617058] 4b1210: 6e20 addb 2000                         |0002: invoke-virtual {v0, v2}, Lcom/lge/lib/lgcast/func/c;.a:([B)Ljava/util/ArrayList; // method@dbad
+[1617059] 4b1216: 0c02                                   |0005: move-result-object v2
+[1617060] 4b1218: 1102                                   |0006: return-object v2
+[1617061]       catches       : (none)
+[1617062]       positions     :
+[1617063]       locals        :
+[1617064] 
+[1617065]     #1              : (in Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;)
+[1617066]       name          : 'createKeys'
+[1617067]       type          : '(Ljava/lang/String;)Ljava/util/ArrayList;'
+[1617068]       access        : 0x0001 (PUBLIC)
+[1617069]       code          -
+[1617070]       registers     : 3
+[1617071]       ins           : 2
+[1617072]       outs          : 2
+[1617073]       insns size    : 7 16-bit code units
+[1617074] 4b121c:                                        |[4b121c] com.lge.lib.lgcast.iface.MasterKeyFactoryIF.createKeys:(Ljava/lang/String;)Ljava/util/ArrayList;
+[1617075] 4b122c: 5410 85bd                              |0000: iget-object v0, v1, Lcom/lge/lib/lgcast/iface/MasterKeyFactoryIF;.a:Lcom/lge/lib/lgcast/func/c; // field@bd85
+[1617076] 4b1230: 6e20 acdb 2000                         |0002: invoke-virtual {v0, v2}, Lcom/lge/lib/lgcast/func/c;.a:(Ljava/lang/String;)Ljava/util/ArrayList; // method@dbac
+[1617077] 4b1236: 0c02                                   |0005: move-result-object v2
+[1617078] 4b1238: 1102                                   |0006: return-object v2
+[1617079]       catches       : (none)
+[1617080]       positions     :
+[1617081]       locals        :
+[1617082] 
+[1617083]   source_file_idx   : -1 (unknown)
+[1617084] 
+[1617085] Class #6003            -
+=== ARCHIVO: C:\Users\riosv\Desktop\Screen Share TV\Screen-Share-TV\analysis\rea_raw\dex_dump20.txt | CLASE: Lcom/lge/lib/lgcast/iface/MasterKey; ===
+[1616973]   Class descriptor  : 'Lcom/lge/lib/lgcast/iface/MasterKey;'
+[1616974]   Access flags      : 0x0001 (PUBLIC)
+[1616975]   Superclass        : 'Ljava/lang/Object;'
+[1616976]   Interfaces        -
+[1616977]   Static fields     -
+[1616978]   Instance fields   -
+[1616979]     #0              : (in Lcom/lge/lib/lgcast/iface/MasterKey;)
+[1616980]       name          : 'key'
+[1616981]       type          : '[B'
+[1616982]       access        : 0x0001 (PUBLIC)
+[1616983]     #1              : (in Lcom/lge/lib/lgcast/iface/MasterKey;)
+[1616984]       name          : 'keySecureText'
+[1616985]       type          : 'Ljava/lang/String;'
+[1616986]       access        : 0x0001 (PUBLIC)
+[1616987]     #2              : (in Lcom/lge/lib/lgcast/iface/MasterKey;)
+[1616988]       name          : 'mki'
+[1616989]       type          : '[B'
+[1616990]       access        : 0x0001 (PUBLIC)
+[1616991]     #3              : (in Lcom/lge/lib/lgcast/iface/MasterKey;)
+[1616992]       name          : 'mkiSecureText'
+[1616993]       type          : 'Ljava/lang/String;'
+[1616994]       access        : 0x0001 (PUBLIC)
+[1616995]   Direct methods    -
+[1616996]     #0              : (in Lcom/lge/lib/lgcast/iface/MasterKey;)
+[1616997]       name          : '<init>'
+[1616998]       type          : '()V'
+[1616999]       access        : 0x10001 (PUBLIC CONSTRUCTOR)
+[1617000]       code          -
+[1617001]       registers     : 1
+[1617002]       ins           : 1
+[1617003]       outs          : 1
+[1617004]       insns size    : 4 16-bit code units
+[1617005] 4b1264:                                        |[4b1264] com.lge.lib.lgcast.iface.MasterKey.<init>:()V
+[1617006] 4b1274: 7010 e2f7 0000                         |0000: invoke-direct {v0}, Ljava/lang/Object;.<init>:()V // method@f7e2
+[1617007] 4b127a: 0e00                                   |0003: return-void
+[1617008]       catches       : (none)
+[1617009]       positions     :
+[1617010]       locals        :
+[1617011] 
+[1617012]   Virtual methods   -
+[1617013]   source_file_idx   : -1 (unknown)
+[1617014] 
+[1617015] Class #6002            -
+=== ARCHIVO: C:\Users\riosv\Desktop\Screen Share TV\Screen-Share-TV\analysis\rea_raw\dex_dump.txt | CLASE: Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP; ===
+=== ARRAY DATA FIXED_KEY ===
+[1186400] 42e7a4: 1300 1e00                              |0000: const/16 v0, #int 30 // #1e
+[1186401] 42e7a8: 2300 2229                              |0002: new-array v0, v0, [B // type@2922
+[1186402] 42e7ac: 2600 0600 0000                         |0004: fill-array-data v0, 0000000a // +00000006
+[1186403] 42e7b2: 6900 3f6b                              |0007: sput-object v0, Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;.FIXED_KEY:[B // field@6b3f
+[1186404] 42e7b6: 0e00                                   |0009: return-void
+[1186405] 42e7b8: 0003 0100 1e00 0000 0123 4567 8901 ... |000a: array-data (19 units)
+[1186406]       catches       : (none)
+[1186407]       positions     :
+[1186408]       locals        :
+[1186409] 
+[1186410]     #1              : (in Lcom/connectsdk/service/webos/lgcast/screenmirroring/ScreenMirroringConfig$RTP;)
+[1186411]       name          : '<init>'
+[1186412]       type          : '()V'
+[1186413]       access        : 0x10001 (PUBLIC CONSTRUCTOR)
+[1186414]       code          -
+[1186415]       registers     : 1
+[1186416]       ins           : 1
+[1186417]       outs          : 1
+[1186418]       insns size    : 4 16-bit code units
+[1186419] 42e7e0:                                        |[42e7e0] com.connectsdk.service.webos.lgcast.screenmirroring.ScreenMirroringConfig$RTP.<init>:()V
+[1186420] 42e7f0: 7010 29f5 0000                         |0000: invoke-direct {v0}, Ljava/lang/Object;.<init>:()V // method@f529
+[1186421] 42e7f6: 0e00                                   |0003: return-void
+[1186422]       catches       : (none)
+[1186423]       positions     :
+[1186424]       locals        :
+[1186425] 
