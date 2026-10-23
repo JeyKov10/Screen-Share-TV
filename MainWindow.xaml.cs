@@ -43,6 +43,8 @@ namespace LGCastPC
         private long _diagFuANaluBytesTotal = 0;
         private long _diagRtpMarker1Count = 0;
         private long _diagRtpMarker0Count = 0;
+        private long _diagFramesCountTotal = 0;
+        private long _diagTsChangesTotal = 0;
         private int _nextRequestId = 0;
         private string _estadoConexion = "UNCONNECTED";
         private string _tvIpAddress = "";
@@ -1534,6 +1536,8 @@ namespace LGCastPC
                 Interlocked.Exchange(ref _diagFuANaluBytesTotal, 0);
                 Interlocked.Exchange(ref _diagRtpMarker1Count, 0);
                 Interlocked.Exchange(ref _diagRtpMarker0Count, 0);
+                Interlocked.Exchange(ref _diagFramesCountTotal, 0);
+                Interlocked.Exchange(ref _diagTsChangesTotal, 0);
 
                 // Iniciar tarea en segundo plano de informe diagnóstico (cada 1 segundo)
                 _ = Task.Run(async () =>
@@ -1546,6 +1550,8 @@ namespace LGCastPC
                     long prevFuAFrags = 0;
                     long prevMarker1 = 0;
                     long prevMarker0 = 0;
+                    long prevFrames = 0;
+                    long prevTsChanges = 0;
 
                     while (!token.IsCancellationRequested)
                     {
@@ -1578,11 +1584,16 @@ namespace LGCastPC
                         long currMarker1 = Interlocked.Read(ref _diagRtpMarker1Count);
                         long currMarker0 = Interlocked.Read(ref _diagRtpMarker0Count);
 
+                        long currFrames = Interlocked.Read(ref _diagFramesCountTotal);
+                        long currTsChanges = Interlocked.Read(ref _diagTsChangesTotal);
+
                         long fuaNalusSec = currFuANalus - prevFuANalus;
                         long fuaFragsSec = currFuAFrags - prevFuAFrags;
                         long avgFuANaluSize = currFuANalus > 0 ? (totalFuABytes / currFuANalus) : 0;
                         long m1Sec = currMarker1 - prevMarker1;
                         long m0Sec = currMarker0 - prevMarker0;
+                        long framesSec = currFrames - prevFrames;
+                        long tsChangesSec = currTsChanges - prevTsChanges;
 
                         prevFfmpegBytes = currFfmpegBytes;
                         prevNalusEnqueued = currNalusEnqueued;
@@ -1592,19 +1603,22 @@ namespace LGCastPC
                         prevFuAFrags = currFuAFrags;
                         prevMarker1 = currMarker1;
                         prevMarker0 = currMarker0;
+                        prevFrames = currFrames;
+                        prevTsChanges = currTsChanges;
 
-                        AgregarLog($"📊 [DIAG FFMPEG->RTP 1s]: FFmpeg: {bytesSec} B/s | NALUs Detectadas: {enqueuedSec}/s (SPS:{sps}, PPS:{pps}, IDR:{idr}, NonIDR:{nonIdr}) | Cola: {_naluQueue.Count} (Max:{maxQueue}, Drop:{droppedTotal}) | RTP Video: {rtpSec} pkt/s (M=1: {m1Sec}/s, M=0: {m0Sec}/s) | FU-A NALUs: {fuaNalusSec}/s ({fuaFragsSec} frags/s, Prom FU-A: {avgFuANaluSize} B) | Max NALU: {maxNaluSize} B");
+                        AgregarLog($"📊 [DIAG FFMPEG->RTP 1s]: FFmpeg: {bytesSec} B/s | NALUs Detectadas: {enqueuedSec}/s (SPS:{sps}, PPS:{pps}, IDR:{idr}, NonIDR:{nonIdr}) | Frames: {framesSec}/s | Timestamp Act: {videoTs} (Incr: {tsChangesSec}/s) | Cola: {_naluQueue.Count} (Max:{maxQueue}, Drop:{droppedTotal}) | RTP Video: {rtpSec} pkt/s (M=1:{m1Sec}/s, M=0:{m0Sec}/s) | FU-A NALUs: {fuaNalusSec}/s ({fuaFragsSec} frags/s, Prom FU-A: {avgFuANaluSize} B) | Max NALU: {maxNaluSize} B");
                     }
                 }, token);
 
                 // Iniciar captura nativa FFmpeg en segundo plano
                 IniciarCapturaFFmpeg(token);
 
-                // Transmisión en segundo plano de paquetes RTP consumiendo TODA la cola NALU con empaquetado RFC 6184
+                // Transmisión en segundo plano de paquetes RTP garantizando que cada Access Unit (frame) tenga su propio timestamp
                 _ = Task.Run(async () =>
                 {
                     byte[] fallbackNal = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x80, 0x1F, 0xDA, 0x01, 0x40, 0x16, 0xEC, 0x04, 0x40 };
                     byte[] dummyAudio = new byte[] { 0xFF, 0xF1, 0x50, 0x80, 0x02, 0x1F, 0xFC };
+                    bool frameVclActivo = false;
 
                     while (!token.IsCancellationRequested && _rtpVideoClient != null)
                     {
@@ -1612,23 +1626,48 @@ namespace LGCastPC
                         {
                             bool seEnviaronNalusReales = false;
 
-                            // Consumir TODA la cola NALU disponible en este ciclo usando RFC 6184 (Single NAL / FU-A)
+                            // Consumir TODA la cola NALU disponible asociando timestamps estrictos por Access Unit
                             while (_naluQueue.TryDequeue(out byte[]? realNal))
                             {
                                 Interlocked.Increment(ref _diagNalusDequeuedTotal);
                                 seEnviaronNalusReales = true;
 
+                                // Detección de límite de Access Unit (inicio de nuevo frame)
+                                int headerOffset = (realNal.Length > 3 && realNal[0] == 0x00 && realNal[1] == 0x00 && realNal[2] == 0x01) ? 3 : 4;
+                                if (realNal.Length > headerOffset)
+                                {
+                                    int nalType = realNal[headerOffset] & 0x1F;
+
+                                    // SPS (7), PPS (8) o AUD (9) inician un I-Frame.
+                                    // Si ya enviamos una VCL Slice (Type 1 o Type 5) y llega otra VCL Slice, es un NUEVO Frame.
+                                    if (nalType == 7 || nalType == 9 || (frameVclActivo && (nalType == 1 || nalType == 5)))
+                                    {
+                                        if (frameVclActivo)
+                                        {
+                                            videoTs += 3000; // Incrementar timestamp 90 kHz para el nuevo frame (~30 FPS)
+                                            Interlocked.Increment(ref _diagFramesCountTotal);
+                                            Interlocked.Increment(ref _diagTsChangesTotal);
+                                            frameVclActivo = false;
+                                        }
+                                    }
+
+                                    if (nalType == 1 || nalType == 5)
+                                    {
+                                        frameVclActivo = true;
+                                    }
+                                }
+
                                 videoSeq = await EnviarNaluRtpRfc6184Async(realNal, ssrc, videoSeq, videoTs);
                             }
 
-                            // Si la cola estuvo vacía, enviar un paquete fallback de mantenimiento (Single NAL)
+                            // Si la cola estuvo vacía en este ciclo, enviar un paquete fallback de mantenimiento con timestamp actual
                             if (!seEnviaronNalusReales)
                             {
                                 videoSeq = await EnviarNaluRtpRfc6184Async(fallbackNal, ssrc, videoSeq, videoTs);
+                                videoTs += 3000;
+                                Interlocked.Increment(ref _diagTsChangesTotal);
+                                frameVclActivo = false;
                             }
-
-                            // Incrementar timestamp únicamente para frames de video (~30 FPS)
-                            videoTs += 3000;
 
                             // Enviar paquete RTP de audio (Payload Type 97 - AAC) si el puerto está configurado
                             if (_rtpAudioClient != null && _audioUdpPort > 0)
