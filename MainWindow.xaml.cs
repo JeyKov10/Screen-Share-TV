@@ -36,6 +36,13 @@ namespace LGCastPC
         private long _diagNaluNonIdrCount = 0;
         private long _diagMaxQueueDepth = 0;
         private long _diagNalusDroppedTotal = 0;
+        private long _diagRtpSingleNalCount = 0;
+        private long _diagRtpFuAFragmentsCount = 0;
+        private long _diagFuANaluCountTotal = 0;
+        private long _diagMaxNaluSize = 0;
+        private long _diagFuANaluBytesTotal = 0;
+        private long _diagRtpMarker1Count = 0;
+        private long _diagRtpMarker0Count = 0;
         private int _nextRequestId = 0;
         private string _estadoConexion = "UNCONNECTED";
         private string _tvIpAddress = "";
@@ -1520,6 +1527,13 @@ namespace LGCastPC
                 Interlocked.Exchange(ref _diagNaluNonIdrCount, 0);
                 Interlocked.Exchange(ref _diagMaxQueueDepth, 0);
                 Interlocked.Exchange(ref _diagNalusDroppedTotal, 0);
+                Interlocked.Exchange(ref _diagRtpSingleNalCount, 0);
+                Interlocked.Exchange(ref _diagRtpFuAFragmentsCount, 0);
+                Interlocked.Exchange(ref _diagFuANaluCountTotal, 0);
+                Interlocked.Exchange(ref _diagMaxNaluSize, 0);
+                Interlocked.Exchange(ref _diagFuANaluBytesTotal, 0);
+                Interlocked.Exchange(ref _diagRtpMarker1Count, 0);
+                Interlocked.Exchange(ref _diagRtpMarker0Count, 0);
 
                 // Iniciar tarea en segundo plano de informe diagnóstico (cada 1 segundo)
                 _ = Task.Run(async () =>
@@ -1528,6 +1542,10 @@ namespace LGCastPC
                     long prevNalusEnqueued = 0;
                     long prevNalusDequeued = 0;
                     long prevRtpPackets = 0;
+                    long prevFuANalus = 0;
+                    long prevFuAFrags = 0;
+                    long prevMarker1 = 0;
+                    long prevMarker0 = 0;
 
                     while (!token.IsCancellationRequested)
                     {
@@ -1552,19 +1570,37 @@ namespace LGCastPC
                         long maxQueue = Interlocked.Read(ref _diagMaxQueueDepth);
                         long droppedTotal = Interlocked.Read(ref _diagNalusDroppedTotal);
 
+                        long currFuANalus = Interlocked.Read(ref _diagFuANaluCountTotal);
+                        long currFuAFrags = Interlocked.Read(ref _diagRtpFuAFragmentsCount);
+                        long totalFuABytes = Interlocked.Read(ref _diagFuANaluBytesTotal);
+                        long maxNaluSize = Interlocked.Read(ref _diagMaxNaluSize);
+
+                        long currMarker1 = Interlocked.Read(ref _diagRtpMarker1Count);
+                        long currMarker0 = Interlocked.Read(ref _diagRtpMarker0Count);
+
+                        long fuaNalusSec = currFuANalus - prevFuANalus;
+                        long fuaFragsSec = currFuAFrags - prevFuAFrags;
+                        long avgFuANaluSize = currFuANalus > 0 ? (totalFuABytes / currFuANalus) : 0;
+                        long m1Sec = currMarker1 - prevMarker1;
+                        long m0Sec = currMarker0 - prevMarker0;
+
                         prevFfmpegBytes = currFfmpegBytes;
                         prevNalusEnqueued = currNalusEnqueued;
                         prevNalusDequeued = currNalusDequeued;
                         prevRtpPackets = currRtpPackets;
+                        prevFuANalus = currFuANalus;
+                        prevFuAFrags = currFuAFrags;
+                        prevMarker1 = currMarker1;
+                        prevMarker0 = currMarker0;
 
-                        AgregarLog($"📊 [DIAG FFMPEG->RTP 1s]: FFmpeg: {bytesSec} B/s | NALUs Detectadas: {enqueuedSec}/s (SPS:{sps}, PPS:{pps}, IDR:{idr}, NonIDR:{nonIdr}) | Cola Actual: {_naluQueue.Count} | Cola Maxima: {maxQueue} | Descartadas: {droppedTotal} | Desencoladas: {dequeuedSec}/s | Tamanio Prom NALU: {avgNaluSize} B | RTP Video: {rtpSec} pkt/s");
+                        AgregarLog($"📊 [DIAG FFMPEG->RTP 1s]: FFmpeg: {bytesSec} B/s | NALUs Detectadas: {enqueuedSec}/s (SPS:{sps}, PPS:{pps}, IDR:{idr}, NonIDR:{nonIdr}) | Cola: {_naluQueue.Count} (Max:{maxQueue}, Drop:{droppedTotal}) | RTP Video: {rtpSec} pkt/s (M=1: {m1Sec}/s, M=0: {m0Sec}/s) | FU-A NALUs: {fuaNalusSec}/s ({fuaFragsSec} frags/s, Prom FU-A: {avgFuANaluSize} B) | Max NALU: {maxNaluSize} B");
                     }
                 }, token);
 
                 // Iniciar captura nativa FFmpeg en segundo plano
                 IniciarCapturaFFmpeg(token);
 
-                // Transmisión en segundo plano de paquetes RTP consumiendo TODA la cola NALU disponible
+                // Transmisión en segundo plano de paquetes RTP consumiendo TODA la cola NALU con empaquetado RFC 6184
                 _ = Task.Run(async () =>
                 {
                     byte[] fallbackNal = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x80, 0x1F, 0xDA, 0x01, 0x40, 0x16, 0xEC, 0x04, 0x40 };
@@ -1576,23 +1612,19 @@ namespace LGCastPC
                         {
                             bool seEnviaronNalusReales = false;
 
-                            // Consumir TODA la cola NALU disponible en este ciclo
+                            // Consumir TODA la cola NALU disponible en este ciclo usando RFC 6184 (Single NAL / FU-A)
                             while (_naluQueue.TryDequeue(out byte[]? realNal))
                             {
                                 Interlocked.Increment(ref _diagNalusDequeuedTotal);
                                 seEnviaronNalusReales = true;
 
-                                byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: realNal);
-                                await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
-                                Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+                                videoSeq = await EnviarNaluRtpRfc6184Async(realNal, ssrc, videoSeq, videoTs);
                             }
 
-                            // Si la cola estuvo vacía, enviar un paquete fallback de mantenimiento
+                            // Si la cola estuvo vacía, enviar un paquete fallback de mantenimiento (Single NAL)
                             if (!seEnviaronNalusReales)
                             {
-                                byte[] rtpVideoPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: fallbackNal);
-                                await _rtpVideoClient.SendAsync(rtpVideoPacket, rtpVideoPacket.Length);
-                                Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+                                videoSeq = await EnviarNaluRtpRfc6184Async(fallbackNal, ssrc, videoSeq, videoTs);
                             }
 
                             // Incrementar timestamp únicamente para frames de video (~30 FPS)
@@ -1780,13 +1812,97 @@ namespace LGCastPC
         }
 
         /// <summary>
-        /// Construye una cabecera RFC 3550 de 12 bytes + payload de datos.
+        /// Empaquetador RTP H.264 compatible RFC 6184 (Single NAL Unit Mode para NALUs <= 1200 B, FU-A Mode para NALUs > 1200 B).
+        /// Asigna el bit Marker (M=1) únicamente en la NALU Single o en el último fragmento de la NALU FU-A (RFC 6184 Section 5.1 & 5.8).
         /// </summary>
-        private byte[] ConstruirPaqueteRtp(byte payloadType, ushort sequenceNumber, uint timestamp, uint ssrc, byte[] payloadData)
+        private async Task<ushort> EnviarNaluRtpRfc6184Async(byte[] nalu, uint ssrc, ushort videoSeq, uint videoTs)
+        {
+            if (_rtpVideoClient == null || nalu == null || nalu.Length == 0) return videoSeq;
+
+            // Detectar offset del header NALU (omitir start code Annex-B 00 00 00 01 o 00 00 01)
+            int headerOffset = (nalu.Length > 3 && nalu[0] == 0x00 && nalu[1] == 0x00 && nalu[2] == 0x01) ? 3 : 4;
+            if (nalu.Length <= headerOffset) return videoSeq;
+
+            int naluPayloadLength = nalu.Length - headerOffset; // Tamaño real de la NALU sin start code
+            ActualizarMaxNaluSize(naluPayloadLength);
+
+            if (naluPayloadLength <= 1200)
+            {
+                // === MODO SINGLE NAL UNIT (RFC 6184 Section 5.6) ===
+                byte[] singleNalData = new byte[naluPayloadLength];
+                Array.Copy(nalu, headerOffset, singleNalData, 0, naluPayloadLength);
+
+                // M=1 en Single NAL Unit mode para indicar fin de NAL / Access Unit
+                byte[] rtpPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: singleNalData, markerBit: true);
+                await _rtpVideoClient.SendAsync(rtpPacket, rtpPacket.Length);
+                Interlocked.Increment(ref _diagRtpSingleNalCount);
+                Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+            }
+            else
+            {
+                // === MODO FRAGMENTACIÓN FU-A (RFC 6184 Section 5.8) ===
+                byte originalNalHeader = nalu[headerOffset];
+                byte fuIndicator = (byte)((originalNalHeader & 0xE0) | 28); // FU Indicator: NRI + Type 28 (0x1C)
+                byte nalType = (byte)(originalNalHeader & 0x1F); // Tipo NAL original
+
+                int rawDataOffset = headerOffset + 1; // Omitir start code Y cabecera NALU original de 1 byte
+                int rawDataLength = nalu.Length - rawDataOffset;
+
+                int maxChunkSize = 1200;
+                int totalFragments = (int)Math.Ceiling((double)rawDataLength / maxChunkSize);
+
+                Interlocked.Increment(ref _diagFuANaluCountTotal);
+                Interlocked.Add(ref _diagFuANaluBytesTotal, naluPayloadLength);
+
+                for (int i = 0; i < totalFragments; i++)
+                {
+                    int currentChunkOffset = rawDataOffset + (i * maxChunkSize);
+                    int currentChunkSize = Math.Min(maxChunkSize, rawDataLength - (i * maxChunkSize));
+
+                    bool isStart = (i == 0);
+                    bool isEnd = (i == totalFragments - 1);
+
+                    byte fuHeader = nalType;
+                    if (isStart) fuHeader |= 0x80; // Start Bit (bit 7)
+                    if (isEnd) fuHeader |= 0x40;   // End Bit (bit 6)
+
+                    // Payload FU-A = 1 byte FU Indicator + 1 byte FU Header + Fragmento de datos H.264
+                    byte[] fuPacketData = new byte[2 + currentChunkSize];
+                    fuPacketData[0] = fuIndicator;
+                    fuPacketData[1] = fuHeader;
+                    Array.Copy(nalu, currentChunkOffset, fuPacketData, 2, currentChunkSize);
+
+                    // M=1 ÚNICAMENTE en el último fragmento FU-A (isEnd) de la NALU
+                    byte[] rtpPacket = ConstruirPaqueteRtp(payloadType: 96, sequenceNumber: videoSeq++, timestamp: videoTs, ssrc: ssrc, payloadData: fuPacketData, markerBit: isEnd);
+                    await _rtpVideoClient.SendAsync(rtpPacket, rtpPacket.Length);
+                    Interlocked.Increment(ref _diagRtpFuAFragmentsCount);
+                    Interlocked.Increment(ref _diagRtpVideoPacketsTotal);
+                }
+            }
+
+            return videoSeq;
+        }
+
+        private void ActualizarMaxNaluSize(long naluSize)
+        {
+            long currentMax;
+            do
+            {
+                currentMax = Interlocked.Read(ref _diagMaxNaluSize);
+                if (naluSize <= currentMax) break;
+            }
+            while (Interlocked.CompareExchange(ref _diagMaxNaluSize, naluSize, currentMax) != currentMax);
+        }
+
+        /// <summary>
+        /// Construye una cabecera RFC 3550 de 12 bytes + payload de datos con soporte para el bit Marker (M).
+        /// </summary>
+        private byte[] ConstruirPaqueteRtp(byte payloadType, ushort sequenceNumber, uint timestamp, uint ssrc, byte[] payloadData, bool markerBit = false)
         {
             byte[] packet = new byte[12 + payloadData.Length];
             packet[0] = 0x80; // V=2, P=0, X=0, CC=0
-            packet[1] = (byte)(payloadType & 0x7F); // M=0, PT=payloadType
+            byte markerByte = (byte)(markerBit ? 0x80 : 0x00);
+            packet[1] = (byte)((payloadType & 0x7F) | markerByte); // M=markerBit (bit 7), PT=payloadType (bits 0-6)
             packet[2] = (byte)(sequenceNumber >> 8);
             packet[3] = (byte)(sequenceNumber & 0xFF);
             packet[4] = (byte)(timestamp >> 24);
@@ -1799,6 +1915,16 @@ namespace LGCastPC
             packet[11] = (byte)(ssrc & 0xFF);
 
             Array.Copy(payloadData, 0, packet, 12, payloadData.Length);
+
+            if (markerBit)
+            {
+                Interlocked.Increment(ref _diagRtpMarker1Count);
+            }
+            else
+            {
+                Interlocked.Increment(ref _diagRtpMarker0Count);
+            }
+
             return packet;
         }
 
